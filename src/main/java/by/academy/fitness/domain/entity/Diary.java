@@ -8,6 +8,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.persistence.Version;
 
 @Entity
 @Table(name = "diary", schema="app")
@@ -23,6 +24,7 @@ public class Diary implements Serializable {
 	@Column(name = "dt_create")
 	private LocalDateTime dtCreate;
 	@Column(name = "dt_update")
+	@Version
 	private LocalDateTime dtUpdate;
 	@Column
 	private Product product;

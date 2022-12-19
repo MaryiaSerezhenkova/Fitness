@@ -6,18 +6,21 @@ import java.util.UUID;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToMany;
 import javax.persistence.Table;
-
-import org.hibernate.annotations.Fetch;
+import javax.persistence.Version;
 
 @Entity
 @Table(name = "product", schema = "app")
 public class Product implements Serializable {
 
+	
+	public enum UNIT {
+		GR, ML
+
+	}
 	/**
 	 * 
 	 */
@@ -27,26 +30,32 @@ public class Product implements Serializable {
 	@Column(name = "dt_create")
 	private LocalDateTime dtCreate;
 	@Column(name = "dt_update")
+	@Version
 	private LocalDateTime dtUpdate;
 	@Column
 	private String name;
 	@Column
 	private int weight;
 	@Column
+	@Enumerated(EnumType.STRING)
 	private UNIT unit;
 	@Column
-	private int energyValue;
-	@ManyToMany
-//@Fetch(Fetch.Type.LAZY)
-	@JoinColumn(name = "user", referencedColumnName = "id")
-	private User user;
+	private int colories;
+	@Column
+	private double proteins;
+	@Column
+	private double fats;
+	@Column
+	private double carbohydrates;
+	
 	
 	public Product() {
 		super();
 	}
 
+
 	public Product(UUID uuid, LocalDateTime dtCreate, LocalDateTime dtUpdate, String name, int weight, UNIT unit,
-			int energyValue, User user) {
+			int colories, double proteins, double fats, double carbohydrates) {
 		super();
 		this.uuid = uuid;
 		this.dtCreate = dtCreate;
@@ -54,72 +63,121 @@ public class Product implements Serializable {
 		this.name = name;
 		this.weight = weight;
 		this.unit = unit;
-		this.energyValue = energyValue;
-		this.user = user;
+		this.colories = colories;
+		this.proteins = proteins;
+		this.fats = fats;
+		this.carbohydrates = carbohydrates;
 	}
+
+
+	public Product(String name, int weight, UNIT unit, int colories, double  proteins, double  fats, double carbohydrates) {
+		this.name = name;
+		this.weight = weight;
+		this.unit = unit;
+		this.colories = colories;
+		this.proteins = proteins;
+		this.fats = fats;
+		this.carbohydrates = carbohydrates;
+	}
+
 
 	public UUID getUuid() {
 		return uuid;
 	}
 
+
 	public void setUuid(UUID uuid) {
 		this.uuid = uuid;
 	}
+
 
 	public LocalDateTime getDtCreate() {
 		return dtCreate;
 	}
 
+
 	public void setDtCreate(LocalDateTime dtCreate) {
 		this.dtCreate = dtCreate;
 	}
+
 
 	public LocalDateTime getDtUpdate() {
 		return dtUpdate;
 	}
 
+
 	public void setDtUpdate(LocalDateTime dtUpdate) {
 		this.dtUpdate = dtUpdate;
 	}
+
 
 	public String getName() {
 		return name;
 	}
 
+
 	public void setName(String name) {
 		this.name = name;
 	}
+
 
 	public int getWeight() {
 		return weight;
 	}
 
+
 	public void setWeight(int weight) {
 		this.weight = weight;
 	}
+
 
 	public UNIT getUnit() {
 		return unit;
 	}
 
+
 	public void setUnit(UNIT unit) {
 		this.unit = unit;
 	}
 
-	public int getEnergyValue() {
-		return energyValue;
+
+	public int getColories() {
+		return colories;
 	}
 
-	public void setEnergyValue(int energyValue) {
-		this.energyValue = energyValue;
+
+	public void setColories(int colories) {
+		this.colories = colories;
 	}
 
-	public User getUser() {
-		return user;
+
+	public double getProteins() {
+		return proteins;
 	}
 
-	public void setUser(User user) {
-		this.user = user;
+
+	public void setProteins(double  proteins) {
+		this.proteins = proteins;
+	}
+
+
+	public double  getFats() {
+		return fats;
+	}
+
+
+	public void setFats(double fats) {
+		this.fats = fats;
+	}
+
+
+	public double  getCarbohydrates() {
+		return carbohydrates;
+	}
+
+
+	public void setCarbohydrates(double carbohydrates) {
+		this.carbohydrates = carbohydrates;
 	}
 
 
@@ -138,12 +196,15 @@ public class Product implements Serializable {
 		builder.append(weight);
 		builder.append(", unit=");
 		builder.append(unit);
-		builder.append(", energyValue=");
-		builder.append(energyValue);
-		builder.append(", user=");
-		builder.append(user);
+		builder.append(", colories=");
+		builder.append(colories);
+		builder.append(", proteins=");
+		builder.append(proteins);
+		builder.append(", fats=");
+		builder.append(fats);
+		builder.append(", carbohydrates=");
+		builder.append(carbohydrates);
 		builder.append("]");
 		return builder.toString();
 	}
-
 }

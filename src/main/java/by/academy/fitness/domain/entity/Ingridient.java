@@ -13,8 +13,8 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "recipe", schema = "app")
-public class Recipe implements Serializable {
+@Table(name = "ingridient", schema = "app")
+public class Ingridient implements Serializable {
 
 	/**
 	 * 
@@ -26,12 +26,10 @@ public class Recipe implements Serializable {
 	private LocalDateTime dtCreate;
 	@Column(name = "dt_update")
 	private LocalDateTime dtUpdate;
-	@ManyToMany
-    @JoinColumn(name = "product", referencedColumnName = "uuid")
+	@ManyToOne
+    @JoinColumn(name = "product_id", referencedColumnName = "uuid")
 	private Product product;
 	@Column
 	private int weight;
-	@ManyToOne
-    @JoinColumn(name = "dish", referencedColumnName = "uuid")
-	private Dish dish;
+	
 }
