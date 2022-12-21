@@ -3,58 +3,47 @@ package by.academy.fitness.domain.entity;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.UUID;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
-import javax.persistence.Version;
 
 @Entity
-@Table(name = "diary", schema = "app")
-public class Diary implements Serializable {
+@Table(name = "ingredient", schema = "app")
+public class Ingredient implements Serializable {
 
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-
 	@Id
 	private UUID uuid;
 	@Column(name = "dt_create")
 	private LocalDateTime dtCreate;
 	@Column(name = "dt_update")
-	@Version
 	private LocalDateTime dtUpdate;
 	@ManyToOne
 	@JoinColumn(name = "product_uuid", referencedColumnName = "uuid")
 	private Product product;
-	@ManyToOne
-	@JoinColumn(name = "dish_uuid", referencedColumnName = "uuid")
-	private Dish dish;
 	@Column
 	private int weight;
-	@Column
-	private LocalDateTime mealTime;
 
-	public Diary() {
+	public Ingredient() {
 		super();
 	}
 
-	public Diary(UUID uuid, LocalDateTime dtCreate, LocalDateTime dtUpdate, Product product, Dish dish, int weight,
-			LocalDateTime mealTime) {
+	public Ingredient(UUID uuid, LocalDateTime dtCreate, LocalDateTime dtUpdate, Product product, int weight) {
 		super();
 		this.uuid = uuid;
 		this.dtCreate = dtCreate;
 		this.dtUpdate = dtUpdate;
 		this.product = product;
-		this.dish = dish;
 		this.weight = weight;
-		this.mealTime = mealTime;
 	}
 
+	
 	public UUID getUuid() {
 		return uuid;
 	}
@@ -87,38 +76,18 @@ public class Diary implements Serializable {
 		this.product = product;
 	}
 
-	public Dish getDish() {
-		return dish;
-	}
-
-	public void setDish(Dish dish) {
-		this.dish = dish;
-	}
-
 	public int getWeight() {
 		return weight;
 	}
 
-	public void setWeight(int dishWeight) {
+	public void setWeight(int weight) {
 		this.weight = weight;
-	}
-
-	public LocalDateTime getMealTime() {
-		return mealTime;
-	}
-
-	public void setMealTime(LocalDateTime mealTime) {
-		this.mealTime = mealTime;
-	}
-
-	public static long getSerialversionuid() {
-		return serialVersionUID;
 	}
 
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
-		builder.append("Diary [uuid=");
+		builder.append("Ingridient [uuid=");
 		builder.append(uuid);
 		builder.append(", dtCreate=");
 		builder.append(dtCreate);
@@ -126,12 +95,8 @@ public class Diary implements Serializable {
 		builder.append(dtUpdate);
 		builder.append(", product=");
 		builder.append(product);
-		builder.append(", dish=");
-		builder.append(dish);
 		builder.append(", weight=");
 		builder.append(weight);
-		builder.append(", mealTime=");
-		builder.append(mealTime);
 		builder.append("]");
 		return builder.toString();
 	}

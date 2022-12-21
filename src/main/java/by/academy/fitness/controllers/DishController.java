@@ -3,7 +3,6 @@ package by.academy.fitness.controllers;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,52 +14,48 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
 import by.academy.fitness.config.TimeConverter;
+import by.academy.fitness.domain.dto.DishDTO;
 import by.academy.fitness.domain.dto.ProductDTO;
-import by.academy.fitness.domain.entity.Product;
-import by.academy.fitness.exceptions.ServiceException;
-import by.academy.fitness.service.ProductService;
+import by.academy.fitness.domain.entity.Dish;
+import by.academy.fitness.service.DishService;
 
 @RestController
-@RequestMapping("/api/product")
-public class ProductController {
-private final ProductService productService;
+@RequestMapping("/api/dish")
+public class DishController {
 	
-
+	private final DishService dishService;
+	
 	@Autowired
-	public ProductController(ProductService productService) {
+	public DishController(DishService dishService) {
 		super();
-		this.productService = productService;
+		this.dishService = dishService;
 	}
 	
 	@GetMapping(value = "/{uuid}")
-	protected ResponseEntity<Product> get(@PathVariable UUID uuid) {
-		return ResponseEntity.ok(productService.read(uuid));
+	protected ResponseEntity<Dish> get(@PathVariable UUID uuid) {
+		return ResponseEntity.ok(dishService.read(uuid));
 	}
-	@GetMapping(value = "/error")
-	protected void errorTest() {
-		throw new ServiceException();
-	}
+
 	
 
 	@GetMapping
-	protected ResponseEntity<List<Product>> getList(){
-		return ResponseEntity.ok(productService.get());
+	protected ResponseEntity<List<Dish>> getList(){
+		return ResponseEntity.ok(dishService.get());
 	}
 
 	
 	@PostMapping
-	public ResponseEntity<Product> doPost(@RequestBody ProductDTO data) {
-		Product created = this.productService.create(data);
+	public ResponseEntity<Dish> doPost(@RequestBody DishDTO data) {
+		Dish created = this.dishService.create(data);
 		return new ResponseEntity<>(created, HttpStatus.CREATED);
 	}
 	@PutMapping(value="/{uuid}/dtUpdate/{dt_update}")
-	protected ResponseEntity<Product> doPut(@PathVariable UUID uuid, @PathVariable("dt_update") long dtUpdateRow,
-			@RequestBody ProductDTO data) {
+	protected ResponseEntity<Dish> doPut(@PathVariable UUID uuid, @PathVariable("dt_update") long dtUpdateRow,
+			@RequestBody DishDTO data) {
 		//LocalDateTime dtUpdate = LocalDateTime.ofInstant(Instant.ofEpochMilli(dtUpdateRow), ZoneId.of("UTC"));
 		LocalDateTime dtUpdate = TimeConverter.convert(dtUpdateRow);
-		return ResponseEntity.ok(this.productService.update(uuid, dtUpdate, data));
+		return ResponseEntity.ok(this.dishService.update(uuid, dtUpdate, data));
 	}
 
 	@DeleteMapping(value="/{uuid}/dtUpdate/{dt_update}")
@@ -68,8 +63,8 @@ private final ProductService productService;
 			@RequestBody ProductDTO data) {
 	//	LocalDateTime dtUpdate = LocalDateTime.ofInstant(Instant.ofEpochMilli(dtUpdateRow), ZoneId.of("UTC"));
 		LocalDateTime dtUpdate = TimeConverter.convert(dtUpdateRow);
-		productService.delete(uuid, dtUpdate);
-		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+		dishService.delete(uuid, dtUpdate);
+		return new ResponseEntity<>(HttpStatus.OK);
 	}
 }
 

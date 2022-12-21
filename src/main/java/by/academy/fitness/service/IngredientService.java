@@ -1,0 +1,66 @@
+package by.academy.fitness.service;
+
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.UUID;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import by.academy.fitness.dao.IngredientDao;
+import by.academy.fitness.domain.builders.IngredientMapper;
+import by.academy.fitness.domain.dto.IngredientDTO;
+import by.academy.fitness.domain.entity.Ingredient;
+import by.academy.fitness.domain.entity.Product;
+import by.academy.fitness.service.interf.IIngredientService;
+
+@Service
+public class IngredientService implements IIngredientService {
+
+	private final IngredientDao ingredientDao;
+
+	@Autowired
+	public IngredientService(IngredientDao ingredientDao) {
+		super();
+		this.ingredientDao = ingredientDao;
+	}
+	@Transactional
+	@Override
+	public Ingredient create(IngredientDTO dto) {
+		Ingredient ingredient = new Ingredient();
+		ingredient.setUuid(UUID.randomUUID());
+		ingredient.setDtCreate(LocalDateTime.now());
+		ingredient.setDtUpdate(ingredient.getDtCreate());
+		Product product = new Product();
+		if (product.getUuid().equals(dto.getProductUuid())) {
+		ingredient.setProduct(product);
+		}
+		ingredient.setWeight(dto.getWeight());
+		return IngredientMapper.ingredientOutputMapping(ingredientDao.create(ingredient));
+	}
+	@Transactional
+	@Override
+	public Ingredient read(UUID uuid) {
+	return ingredientDao.read(uuid);
+	}
+	@Transactional
+	@Override
+	public List<Ingredient> get() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	@Transactional
+	@Override
+	public Ingredient update(UUID uuid, LocalDateTime dtUpdate, IngredientDTO dto) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	@Transactional
+	@Override
+	public void delete(UUID uuid, LocalDateTime dtUpdate) {
+		// TODO Auto-generated method stub
+
+	}
+
+}

@@ -9,10 +9,11 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Version;
+
+import by.academy.fitness.domain.dto.IngredientDTO;
 
 @Entity
 @Table(name = "dish", schema = "app")
@@ -32,13 +33,85 @@ public class Dish implements Serializable {
 	@Column
 	private String name;
 	@OneToMany
-    @JoinColumn(name = "ingridient_id", referencedColumnName = "uuid")
-	private List<Ingridient> ingridients;
-//	@ManyToMany
-//    @JoinColumn(name = "user", referencedColumnName = "uuid")
-//	private User user;
+	@JoinColumn(name = "ingredient_uuid", referencedColumnName = "uuid")
+	private List<Ingredient> ingredients;
+	
+	
+	
+	public Dish() {
+		super();
+	}
 
-	
-	
+
+	public Dish(UUID uuid, LocalDateTime dtCreate, LocalDateTime dtUpdate, String name, List<Ingredient> ingredients) {
+		super();
+		this.uuid = uuid;
+		this.dtCreate = dtCreate;
+		this.dtUpdate = dtUpdate;
+		this.name = name;
+		this.ingredients = ingredients;
+	}
+
+	public Dish(String name, List<IngredientDTO> ingredients2) {
+		this.name = name;
+	}
+
+	public UUID getUuid() {
+		return uuid;
+	}
+
+	public void setUuid(UUID uuid) {
+		this.uuid = uuid;
+	}
+
+	public LocalDateTime getDtCreate() {
+		return dtCreate;
+	}
+
+	public void setDtCreate(LocalDateTime dtCreate) {
+		this.dtCreate = dtCreate;
+	}
+
+	public LocalDateTime getDtUpdate() {
+		return dtUpdate;
+	}
+
+	public void setDtUpdate(LocalDateTime dtUpdate) {
+		this.dtUpdate = dtUpdate;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public List<Ingredient> getIngredients() {
+		return ingredients;
+	}
+
+	public void setIngridients(List<Ingredient> ingridients) {
+		this.ingredients = ingridients;
+	}
+
+
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("Dish [uuid=");
+		builder.append(uuid);
+		builder.append(", dtCreate=");
+		builder.append(dtCreate);
+		builder.append(", dtUpdate=");
+		builder.append(dtUpdate);
+		builder.append(", name=");
+		builder.append(name);
+		builder.append(", ingridients=");
+		builder.append(ingredients);
+		builder.append("]");
+		return builder.toString();
+	}
 
 }
