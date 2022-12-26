@@ -19,23 +19,21 @@ import by.academy.fitness.service.interf.IIngredientService;
 public class IngredientService implements IIngredientService {
 
 	private final IngredientDao ingredientDao;
+	private final ProductService productService;
 
 	@Autowired
-	public IngredientService(IngredientDao ingredientDao) {
+	public IngredientService(IngredientDao ingredientDao, ProductService productService) {
 		super();
 		this.ingredientDao = ingredientDao;
+		this.productService=productService;
 	}
 	@Transactional
 	@Override
 	public Ingredient create(IngredientDTO dto) {
 		Ingredient ingredient = new Ingredient();
 		ingredient.setUuid(UUID.randomUUID());
-		ingredient.setDtCreate(LocalDateTime.now());
-		ingredient.setDtUpdate(ingredient.getDtCreate());
-		Product product = new Product();
-		if (product.getUuid().equals(dto.getProductUuid())) {
+		Product product = productService.read(dto.getProductUuid());
 		ingredient.setProduct(product);
-		}
 		ingredient.setWeight(dto.getWeight());
 		return IngredientMapper.ingredientOutputMapping(ingredientDao.create(ingredient));
 	}
@@ -47,8 +45,7 @@ public class IngredientService implements IIngredientService {
 	@Transactional
 	@Override
 	public List<Ingredient> get() {
-		// TODO Auto-generated method stub
-		return null;
+		return ingredientDao.get();
 	}
 	@Transactional
 	@Override

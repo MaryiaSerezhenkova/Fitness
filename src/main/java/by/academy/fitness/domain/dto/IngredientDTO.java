@@ -5,6 +5,7 @@ import java.util.UUID;
 public class IngredientDTO {
 
 	private UUID productUuid;
+	
 
 	private int weight;
 

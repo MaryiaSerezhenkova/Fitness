@@ -10,24 +10,25 @@ import javax.persistence.PersistenceContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
-import by.academy.fitness.dao.interf.IDishDao;
-import by.academy.fitness.domain.entity.Dish;
+import by.academy.fitness.dao.interf.IDiaryDao;
+import by.academy.fitness.domain.entity.Diary;
 @Repository
-public class DishDao implements IDishDao {
+public class DiaryDao implements IDiaryDao {
 
 	@PersistenceContext
 	private final EntityManager entityManager;
 	
-	private static final String SELECT_SQL = "SELECT * from app.dish ORDER BY dt_create";
+	private static final String SELECT_SQL = "SELECT * from app.diary ORDER BY dt_create";
 	
 	@Autowired
-	public DishDao(EntityManager entityManager) {
+
+	public DiaryDao(EntityManager entityManager) {
 		super();
 		this.entityManager = entityManager;
 	}
 
 	@Override
-	public Dish create(Dish item) {
+	public Diary create(Diary item) {
 		try {
 			entityManager.persist(item);
 			return item;
@@ -37,25 +38,25 @@ public class DishDao implements IDishDao {
 	}
 
 	@Override
-	public Dish read(UUID uuid) {
+	public Diary read(UUID uuid) {
 		try {
-			Dish dish = entityManager.find(Dish.class, uuid);
-			if (dish == null) {
+			Diary diary = entityManager.find(Diary.class, uuid);
+			if (diary == null) {
 				throw new Exception("Такой записи не существует");
 			}
-			return dish;
+			return diary;
 		} catch (Exception e) {
 			throw new RuntimeException("При чтении данных произошла ошибка", e);
 		}
 	}
 
 	@Override
-	public List<Dish> get() {
-		return entityManager.createNativeQuery(SELECT_SQL, Dish.class).getResultList();
+	public List<Diary> get() {
+		return entityManager.createNativeQuery(SELECT_SQL, Diary.class).getResultList();
 	}
 
 	@Override
-	public Dish update(UUID uuid, LocalDateTime dtUpdate, Dish type) {
+	public Diary update(UUID uuid, LocalDateTime dtUpdate, Diary type) {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -67,6 +68,4 @@ public class DishDao implements IDishDao {
 	}
 	
 	
-
-
 }

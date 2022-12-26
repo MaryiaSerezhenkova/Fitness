@@ -1,10 +1,13 @@
 package by.academy.fitness.domain.entity;
 
 import java.io.Serializable;
-import java.time.LocalDateTime;
 import java.util.UUID;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
@@ -20,25 +23,19 @@ public class Ingredient implements Serializable {
 	private static final long serialVersionUID = 1L;
 	@Id
 	private UUID uuid;
-	@Column(name = "dt_create")
-	private LocalDateTime dtCreate;
-	@Column(name = "dt_update")
-	private LocalDateTime dtUpdate;
 	@ManyToOne
 	@JoinColumn(name = "product_uuid", referencedColumnName = "uuid")
 	private Product product;
 	@Column
 	private int weight;
+	
 
 	public Ingredient() {
 		super();
 	}
 
-	public Ingredient(UUID uuid, LocalDateTime dtCreate, LocalDateTime dtUpdate, Product product, int weight) {
+	public Ingredient(UUID uuid, Product product, int weight) {
 		super();
-		this.uuid = uuid;
-		this.dtCreate = dtCreate;
-		this.dtUpdate = dtUpdate;
 		this.product = product;
 		this.weight = weight;
 	}
@@ -50,22 +47,6 @@ public class Ingredient implements Serializable {
 
 	public void setUuid(UUID uuid) {
 		this.uuid = uuid;
-	}
-
-	public LocalDateTime getDtCreate() {
-		return dtCreate;
-	}
-
-	public void setDtCreate(LocalDateTime dtCreate) {
-		this.dtCreate = dtCreate;
-	}
-
-	public LocalDateTime getDtUpdate() {
-		return dtUpdate;
-	}
-
-	public void setDtUpdate(LocalDateTime dtUpdate) {
-		this.dtUpdate = dtUpdate;
 	}
 
 	public Product getProduct() {
@@ -87,12 +68,8 @@ public class Ingredient implements Serializable {
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
-		builder.append("Ingridient [uuid=");
+		builder.append("Ingredient [uuid=");
 		builder.append(uuid);
-		builder.append(", dtCreate=");
-		builder.append(dtCreate);
-		builder.append(", dtUpdate=");
-		builder.append(dtUpdate);
 		builder.append(", product=");
 		builder.append(product);
 		builder.append(", weight=");
@@ -101,4 +78,5 @@ public class Ingredient implements Serializable {
 		return builder.toString();
 	}
 
+	
 }

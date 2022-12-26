@@ -3,10 +3,13 @@ package by.academy.fitness.dao;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
+
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
+
 import by.academy.fitness.dao.interf.IIngredientDao;
 import by.academy.fitness.domain.entity.Ingredient;
 
@@ -15,8 +18,7 @@ public class IngredientDao implements IIngredientDao {
 
 	@PersistenceContext
 	private final EntityManager entityManager;
-	// private static final String SELECT_SQL = "SELECT * from app.ingridient ORDER
-	// BY dt_create";
+	private static final String SELECT_SQL = "SELECT * from app.ingredient ORDER BY dish_uuid";
 
 	@Autowired
 	public IngredientDao(EntityManager entityManager) {
@@ -49,8 +51,7 @@ public class IngredientDao implements IIngredientDao {
 
 	@Override
 	public List<Ingredient> get() {
-		// TODO Auto-generated method stub
-		return null;
+		return entityManager.createNativeQuery(SELECT_SQL, Ingredient.class).getResultList();
 	}
 
 	@Override
@@ -60,10 +61,6 @@ public class IngredientDao implements IIngredientDao {
 			if (ingredient == null) {
 				throw new Exception("Такой записи не существует");
 			}
-			if (!ingredient.getDtUpdate().equals(dtUpdate)) {
-				throw new RuntimeException("Запись устарела");
-			}
-			ingredient.setDtUpdate(type.getDtUpdate());
 			ingredient.setProduct(type.getProduct());
 			ingredient.setWeight(type.getWeight());
 			;
@@ -79,9 +76,6 @@ public class IngredientDao implements IIngredientDao {
 			Ingredient ingredient = entityManager.find(Ingredient.class, uuid);
 			if (ingredient == null) {
 				throw new Exception("Такой записи не существует");
-			}
-			if (!ingredient.getDtUpdate().equals(dtUpdate)) {
-				throw new RuntimeException("Запись устарела");
 			}
 			entityManager.remove(ingredient);
 

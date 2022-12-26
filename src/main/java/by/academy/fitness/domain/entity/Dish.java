@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -32,16 +33,21 @@ public class Dish implements Serializable {
 	private LocalDateTime dtUpdate;
 	@Column
 	private String name;
-	@OneToMany
-	@JoinColumn(name = "ingredient_uuid", referencedColumnName = "uuid")
+	@OneToMany (cascade=CascadeType.ALL, orphanRemoval = true)
+	@JoinColumn(name = "dish_uuid", referencedColumnName = "uuid")
 	private List<Ingredient> ingredients;
-	
-	
-	
+
 	public Dish() {
 		super();
 	}
 
+	public Dish(UUID uuid, LocalDateTime dtCreate, LocalDateTime dtUpdate, String name) {
+		super();
+		this.uuid = uuid;
+		this.dtCreate = dtCreate;
+		this.dtUpdate = dtUpdate;
+		this.name = name;
+	}
 
 	public Dish(UUID uuid, LocalDateTime dtCreate, LocalDateTime dtUpdate, String name, List<Ingredient> ingredients) {
 		super();
@@ -92,10 +98,9 @@ public class Dish implements Serializable {
 		return ingredients;
 	}
 
-	public void setIngridients(List<Ingredient> ingridients) {
-		this.ingredients = ingridients;
+	public void setIngredients(List<Ingredient> ingredients) {
+		this.ingredients = ingredients;
 	}
-
 
 	@Override
 	public String toString() {
@@ -108,7 +113,7 @@ public class Dish implements Serializable {
 		builder.append(dtUpdate);
 		builder.append(", name=");
 		builder.append(name);
-		builder.append(", ingridients=");
+		builder.append(", ingredients=");
 		builder.append(ingredients);
 		builder.append("]");
 		return builder.toString();
