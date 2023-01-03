@@ -1,17 +1,27 @@
 package by.academy.fitness.domain.entity;
 
-import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
 import javax.persistence.Version;
 
 @Entity
-@Table(name = "user", schema = "app")
-public class User implements Serializable {
+@Table(name = "users", schema = "app", uniqueConstraints = { @UniqueConstraint(columnNames = "nick"),
+		@UniqueConstraint(columnNames = "email") })
+public class User  implements IEntity {
 
 	private static final long serialVersionUID = 1L;
 
@@ -32,31 +42,42 @@ public class User implements Serializable {
 	@Column(name = "dt_update")
 	@Version
 	private LocalDateTime dtUpdate;
-	@Column
-	private String mail;
-	@Column
+	@Column(length = 50)
+	private String email;
+	@Column(length = 20)
 	private String nick;
 	@Column
-	private ROLE role;
+	@Enumerated(EnumType.STRING)
+	@ManyToMany(fetch = FetchType.LAZY)
+	@JoinTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_uuid"), inverseJoinColumns = @JoinColumn(name = "role_id"))
+	private Set<Role> roles = new HashSet<>();
+	// private ROLE role;
 	@Column
+	@Enumerated(EnumType.STRING)
 	private USERSTATUS status;
-	@Column
+	@Column(length = 120)
 	private String password;
 
 	public User() {
 		super();
 	}
 
-	public User(UUID uuid, LocalDateTime dtCreate, LocalDateTime dtUpdate, String mail, String nick, ROLE role,
+	public User(UUID uuid, LocalDateTime dtCreate, LocalDateTime dtUpdate, String email, String nick, Set<Role> roles,
 			USERSTATUS status, String password) {
 		super();
 		this.uuid = uuid;
 		this.dtCreate = dtCreate;
 		this.dtUpdate = dtUpdate;
-		this.mail = mail;
+		this.email = email;
 		this.nick = nick;
-		this.role = role;
+		this.roles = roles;
 		this.status = status;
+		this.password = password;
+	}
+
+	public User(String email, String nick, String password) {
+		this.email = email;
+		this.nick = nick;
 		this.password = password;
 	}
 
@@ -84,12 +105,12 @@ public class User implements Serializable {
 		this.dtUpdate = dtUpdate;
 	}
 
-	public String getMail() {
-		return mail;
+	public String getEmail() {
+		return email;
 	}
 
-	public void setMail(String mail) {
-		this.mail = mail;
+	public void setEmail(String email) {
+		this.email = email;
 	}
 
 	public String getNick() {
@@ -100,12 +121,12 @@ public class User implements Serializable {
 		this.nick = nick;
 	}
 
-	public ROLE getRole() {
-		return role;
+	public Set<Role> getRoles() {
+		return roles;
 	}
 
-	public void setRole(ROLE role) {
-		this.role = role;
+	public void setRoles(Set<Role> roles) {
+		this.roles = roles;
 	}
 
 	public USERSTATUS getStatus() {
@@ -133,12 +154,12 @@ public class User implements Serializable {
 		builder.append(dtCreate);
 		builder.append(", dtUpdate=");
 		builder.append(dtUpdate);
-		builder.append(", mail=");
-		builder.append(mail);
+		builder.append(", email=");
+		builder.append(email);
 		builder.append(", nick=");
 		builder.append(nick);
-		builder.append(", role=");
-		builder.append(role);
+		builder.append(", roles=");
+		builder.append(roles);
 		builder.append(", status=");
 		builder.append(status);
 		builder.append(", password=");

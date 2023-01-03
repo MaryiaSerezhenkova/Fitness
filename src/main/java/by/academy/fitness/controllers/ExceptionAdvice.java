@@ -31,14 +31,6 @@ public class ExceptionAdvice {
 
 	
 
-//	@ExceptionHandler(ConsistencyViolationException.class)
-//	@ResponseStatus(HttpStatus.FORBIDDEN)
-//	public ErrorInfoDTO consistencyViolation(ConsistencyViolationException ex, Locale locale) {
-//		log.error("Broken consistency", ex);
-//		return new ErrorInfoDTO(messageSource.getMessage(ex.getCode(), null, locale));
-//	}
-
-
 	@ExceptionHandler(EntityNotFoundException.class)
 	@ResponseStatus(value = HttpStatus.NOT_FOUND)
 	@ResponseBody

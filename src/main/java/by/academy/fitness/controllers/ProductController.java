@@ -14,10 +14,14 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import by.academy.fitness.config.TimeConverter;
+import by.academy.fitness.dao.Filtering;
+import by.academy.fitness.dao.Sorting;
 import by.academy.fitness.domain.dto.ProductDTO;
+import by.academy.fitness.domain.entity.Page;
 import by.academy.fitness.domain.entity.Product;
 import by.academy.fitness.exceptions.ServiceException;
 import by.academy.fitness.service.ProductService;
@@ -45,8 +49,9 @@ private final ProductService productService;
 	
 
 	@GetMapping
-	protected ResponseEntity<List<Product>> getList(){
-		return ResponseEntity.ok(productService.get());
+	protected ResponseEntity<Page<Product>> getList(Integer amount, Integer skip, @RequestParam(required=false)List<Sorting> sortings, List<Filtering> filtering) {
+	    Page<Product> page = productService.get(amount, skip, sortings, filtering);
+		return ResponseEntity.ok(page);
 	}
 
 	

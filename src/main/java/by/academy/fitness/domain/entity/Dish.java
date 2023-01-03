@@ -1,6 +1,5 @@
 package by.academy.fitness.domain.entity;
 
-import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -18,11 +17,8 @@ import by.academy.fitness.domain.dto.IngredientDTO;
 
 @Entity
 @Table(name = "dish", schema = "app")
-public class Dish implements Serializable {
+public class Dish implements IEntity {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 	@Id
 	private UUID uuid;

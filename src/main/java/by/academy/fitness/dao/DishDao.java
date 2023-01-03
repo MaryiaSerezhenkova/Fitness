@@ -1,11 +1,10 @@
 package by.academy.fitness.dao;
 
-import java.time.LocalDateTime;
-import java.util.List;
 import java.util.UUID;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.criteria.CriteriaUpdate;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -13,12 +12,12 @@ import org.springframework.stereotype.Repository;
 import by.academy.fitness.dao.interf.IDishDao;
 import by.academy.fitness.domain.entity.Dish;
 @Repository
-public class DishDao implements IDishDao {
+public class DishDao extends BaseEntityDAO<UUID, Dish> implements IDishDao {
 
 	@PersistenceContext
 	private final EntityManager entityManager;
 	
-	private static final String SELECT_SQL = "SELECT * from app.dish ORDER BY dt_create";
+	//private static final String SELECT_SQL = "SELECT * from app.dish ORDER BY dt_create";
 	
 	@Autowired
 	public DishDao(EntityManager entityManager) {
@@ -27,43 +26,16 @@ public class DishDao implements IDishDao {
 	}
 
 	@Override
-	public Dish create(Dish item) {
-		try {
-			entityManager.persist(item);
-			return item;
-		} catch (Exception e) {
-			throw new RuntimeException("При сохранении данных произошла ошибка", e);
-		}
-	}
-
-	@Override
-	public Dish read(UUID uuid) {
-		try {
-			Dish dish = entityManager.find(Dish.class, uuid);
-			if (dish == null) {
-				throw new Exception("Такой записи не существует");
-			}
-			return dish;
-		} catch (Exception e) {
-			throw new RuntimeException("При чтении данных произошла ошибка", e);
-		}
-	}
-
-	@Override
-	public List<Dish> get() {
-		return entityManager.createNativeQuery(SELECT_SQL, Dish.class).getResultList();
-	}
-
-	@Override
-	public Dish update(UUID uuid, LocalDateTime dtUpdate, Dish type) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public void delete(UUID uuid, LocalDateTime dtUpdate) {
-		// TODO Auto-generated method stub
+	protected void updateFields(CriteriaUpdate<Dish> criteria, Dish entity) {
+		criteria.set("dt_update", entity.getDtUpdate());
+		criteria.set("name", entity.getName());
+		criteria.set("ingridients", entity.getIngredients());
 		
+	}
+
+	@Override
+	protected Class<Dish> getClazz() {
+		return Dish.class;
 	}
 	
 	

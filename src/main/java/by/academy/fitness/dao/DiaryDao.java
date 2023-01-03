@@ -37,7 +37,6 @@ public class DiaryDao implements IDiaryDao {
 		}
 	}
 
-	@Override
 	public Diary read(UUID uuid) {
 		try {
 			Diary diary = entityManager.find(Diary.class, uuid);
@@ -50,7 +49,6 @@ public class DiaryDao implements IDiaryDao {
 		}
 	}
 
-	@Override
 	public List<Diary> get() {
 		return entityManager.createNativeQuery(SELECT_SQL, Diary.class).getResultList();
 	}
@@ -65,6 +63,18 @@ public class DiaryDao implements IDiaryDao {
 	public void delete(UUID uuid, LocalDateTime dtUpdate) {
 		// TODO Auto-generated method stub
 		
+	}
+
+	@Override
+	public Diary findByUuid(UUID uuid) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public List<Diary> findAll(Integer amount, Integer skip, List<Sorting> sortings, List<Filtering> filters) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 	
 	

@@ -1,6 +1,5 @@
 package by.academy.fitness.domain.entity;
 
-import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -14,7 +13,7 @@ import javax.persistence.Version;
 
 @Entity
 @Table(name = "diary", schema = "app")
-public class Diary implements Serializable {
+public class Diary implements IEntity {
 
 	/**
 	 * 

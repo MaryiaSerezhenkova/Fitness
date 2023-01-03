@@ -1,6 +1,6 @@
 package by.academy.fitness.domain.entity;
 
-import java.io.Serializable;
+import java.lang.annotation.Annotation;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -14,7 +14,7 @@ import javax.persistence.Version;
 
 @Entity
 @Table(name = "product", schema = "app")
-public class Product implements Serializable {
+public class Product implements IEntity {
 
 	
 	public enum UNIT {
@@ -207,4 +207,5 @@ public class Product implements Serializable {
 		builder.append("]");
 		return builder.toString();
 	}
+
 }

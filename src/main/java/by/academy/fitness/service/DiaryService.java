@@ -8,9 +8,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import by.academy.fitness.dao.DiaryDao;
+import by.academy.fitness.dao.Filtering;
+import by.academy.fitness.dao.Sorting;
 import by.academy.fitness.domain.builders.DiaryMapper;
 import by.academy.fitness.domain.dto.DiaryDTO;
 import by.academy.fitness.domain.entity.Diary;
+import by.academy.fitness.domain.entity.Page;
 import by.academy.fitness.service.interf.IDiaryService;
 
 @Service
@@ -46,9 +49,8 @@ public class DiaryService implements IDiaryService {
 		return diaryDao.read(uuid);
 	}
 
-	@Override
 	public List<Diary> get() {
-		return diaryDao.get();
+		return diaryDao.findAll(null, null, null, null);
 	}
 
 	@Override
@@ -61,6 +63,12 @@ public class DiaryService implements IDiaryService {
 	public void delete(UUID uuid, LocalDateTime dtUpdate) {
 		// TODO Auto-generated method stub
 
+	}
+
+	@Override
+	public Page<Diary> get(Integer amount, Integer skip, List<Sorting> sortings, List<Filtering> filters) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }
