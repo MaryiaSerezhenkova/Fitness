@@ -11,6 +11,12 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Version;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+
+import by.academy.fitness.config.CustomLocalDateTimeDesSerializer;
+import by.academy.fitness.config.CustomLocalDateTimeSerializer;
+
 @Entity
 @Table(name = "diary", schema = "app")
 public class Diary implements IEntity {
@@ -23,9 +29,13 @@ public class Diary implements IEntity {
 	@Id
 	private UUID uuid;
 	@Column(name = "dt_create")
+	@JsonSerialize(using = CustomLocalDateTimeSerializer.class)
+	@JsonDeserialize(using = CustomLocalDateTimeDesSerializer.class)
 	private LocalDateTime dtCreate;
 	@Column(name = "dt_update")
 	@Version
+	@JsonSerialize(using = CustomLocalDateTimeSerializer.class)
+	@JsonDeserialize(using = CustomLocalDateTimeDesSerializer.class)
 	private LocalDateTime dtUpdate;
 	@ManyToOne
 	@JoinColumn(name = "product_uuid", referencedColumnName = "uuid")
@@ -36,6 +46,8 @@ public class Diary implements IEntity {
 	@Column
 	private int weight;
 	@Column
+	@JsonSerialize(using = CustomLocalDateTimeSerializer.class)
+	@JsonDeserialize(using = CustomLocalDateTimeDesSerializer.class)
 	private LocalDateTime mealTime;
 
 	public Diary() {

@@ -18,10 +18,16 @@ import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 import javax.persistence.Version;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+
+import by.academy.fitness.config.CustomLocalDateTimeDesSerializer;
+import by.academy.fitness.config.CustomLocalDateTimeSerializer;
+
 @Entity
-@Table(name = "users", schema = "app", uniqueConstraints = { @UniqueConstraint(columnNames = "nick"),
+@Table(name = "users", schema = "app", uniqueConstraints = { @UniqueConstraint(columnNames = "username"),
 		@UniqueConstraint(columnNames = "email") })
-public class User  implements IEntity {
+public class User implements IEntity {
 
 	private static final long serialVersionUID = 1L;
 
@@ -38,14 +44,18 @@ public class User  implements IEntity {
 	@Id
 	private UUID uuid;
 	@Column(name = "dt_create")
+	@JsonSerialize(using = CustomLocalDateTimeSerializer.class)
+	@JsonDeserialize(using = CustomLocalDateTimeDesSerializer.class)
 	private LocalDateTime dtCreate;
 	@Column(name = "dt_update")
 	@Version
+	@JsonSerialize(using = CustomLocalDateTimeSerializer.class)
+	@JsonDeserialize(using = CustomLocalDateTimeDesSerializer.class)
 	private LocalDateTime dtUpdate;
 	@Column(length = 50)
 	private String email;
 	@Column(length = 20)
-	private String nick;
+	private String username;
 	@Column
 	@Enumerated(EnumType.STRING)
 	@ManyToMany(fetch = FetchType.LAZY)
@@ -62,22 +72,22 @@ public class User  implements IEntity {
 		super();
 	}
 
-	public User(UUID uuid, LocalDateTime dtCreate, LocalDateTime dtUpdate, String email, String nick, Set<Role> roles,
-			USERSTATUS status, String password) {
+	public User(UUID uuid, LocalDateTime dtCreate, LocalDateTime dtUpdate, String email, String username,
+			Set<Role> roles, USERSTATUS status, String password) {
 		super();
 		this.uuid = uuid;
 		this.dtCreate = dtCreate;
 		this.dtUpdate = dtUpdate;
 		this.email = email;
-		this.nick = nick;
+		this.username = username;
 		this.roles = roles;
 		this.status = status;
 		this.password = password;
 	}
 
-	public User(String email, String nick, String password) {
+	public User(String email, String username, String password) {
 		this.email = email;
-		this.nick = nick;
+		this.username = username;
 		this.password = password;
 	}
 
@@ -113,12 +123,12 @@ public class User  implements IEntity {
 		this.email = email;
 	}
 
-	public String getNick() {
-		return nick;
+	public String getUsername() {
+		return username;
 	}
 
-	public void setNick(String nick) {
-		this.nick = nick;
+	public void setUsername(String username) {
+		this.username = username;
 	}
 
 	public Set<Role> getRoles() {
@@ -156,8 +166,8 @@ public class User  implements IEntity {
 		builder.append(dtUpdate);
 		builder.append(", email=");
 		builder.append(email);
-		builder.append(", nick=");
-		builder.append(nick);
+		builder.append(", username=");
+		builder.append(username);
 		builder.append(", roles=");
 		builder.append(roles);
 		builder.append(", status=");

@@ -40,6 +40,7 @@ public class ProductDao extends BaseEntityDAO<UUID, Product> implements IProduct
 		criteria.set("proteins", entity.getProteins());
 		criteria.set("fats", entity.getFats());
 		criteria.set("carbohydrates", entity.getCarbohydrates());
+	
 	}
 
 }

@@ -2,25 +2,25 @@ package by.academy.fitness.domain.dto;
 
 public class UserLoginDTO {
 
-	private String mail;
+	private String email;
 	private String password;
 
 	public UserLoginDTO() {
 		super();
 	}
 
-	public UserLoginDTO(String mail, String password) {
+	public UserLoginDTO(String email, String password) {
 		super();
-		this.mail = mail;
+		this.email = email;
 		this.password = password;
 	}
 
-	public String getMail() {
-		return mail;
+	public String getEmail() {
+		return email;
 	}
 
-	public void setMail(String mail) {
-		this.mail = mail;
+	public void setEmail(String email) {
+		this.email = email;
 	}
 
 	public String getPassword() {

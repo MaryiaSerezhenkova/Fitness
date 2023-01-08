@@ -3,6 +3,12 @@ package by.academy.fitness.domain.dto;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+
+import by.academy.fitness.config.CustomLocalDateTimeDesSerializer;
+import by.academy.fitness.config.CustomLocalDateTimeSerializer;
+
 public class DiaryDTO {
 
 	private UUID productUuid;
@@ -10,7 +16,8 @@ public class DiaryDTO {
 	private UUID dishUuid;
 
 	private int weight;
-
+	@JsonSerialize(using = CustomLocalDateTimeSerializer.class)
+	@JsonDeserialize(using = CustomLocalDateTimeDesSerializer.class)
 	private LocalDateTime mealTime;
 
 	public DiaryDTO() {

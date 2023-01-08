@@ -13,6 +13,11 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Version;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+
+import by.academy.fitness.config.CustomLocalDateTimeDesSerializer;
+import by.academy.fitness.config.CustomLocalDateTimeSerializer;
 import by.academy.fitness.domain.dto.IngredientDTO;
 
 @Entity
@@ -23,9 +28,13 @@ public class Dish implements IEntity {
 	@Id
 	private UUID uuid;
 	@Column(name = "dt_create")
+	@JsonSerialize(using = CustomLocalDateTimeSerializer.class)
+	@JsonDeserialize(using = CustomLocalDateTimeDesSerializer.class)
 	private LocalDateTime dtCreate;
 	@Column(name = "dt_update")
 	@Version
+	@JsonSerialize(using = CustomLocalDateTimeSerializer.class)
+	@JsonDeserialize(using = CustomLocalDateTimeDesSerializer.class)
 	private LocalDateTime dtUpdate;
 	@Column
 	private String name;

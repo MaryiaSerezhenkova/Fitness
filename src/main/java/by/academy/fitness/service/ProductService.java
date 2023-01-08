@@ -52,12 +52,17 @@ public class ProductService implements IProductService {
 		page.setPageSize(amount);
 		int count = productDao.count(filters);
 		page.setTotalElements(count);
-		page.setTotalPages(count/amount);
+		int pageSize = count / (amount.intValue() == 0 ? 1 : amount.intValue());
+		if (count % (amount.intValue() == 0 ? 1 : amount.intValue()) > 0) {
+			pageSize++;
+		}
+		int currentPage = skip.intValue()/amount.intValue();
+		page.setPageNumber(currentPage);
+		page.setTotalPages(pageSize);
 		page.setFirst(skip == 0);
-		page.setLast(count%skip<amount);
-
+		page.setLast(currentPage==pageSize);
 		return page;
-		
+
 //		private int pageNumber;
 //		private int pageSize;
 //		private int totalPages;
