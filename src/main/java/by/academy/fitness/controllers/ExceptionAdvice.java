@@ -58,6 +58,7 @@ public class ExceptionAdvice {
 	@ExceptionHandler(Throwable.class)
 	@ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
 	public ErrorInfoDTO handleAll(Throwable ex) {
+		ex.printStackTrace();
 		return new ErrorInfoDTO(ex.getMessage());
 	}
 }
