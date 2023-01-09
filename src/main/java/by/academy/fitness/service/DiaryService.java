@@ -41,34 +41,58 @@ public class DiaryService implements IDiaryService {
 		diary.setProduct(productService.read(dto.getProductUuid()));
 		diary.setWeight(dto.getWeight());
 		diary.setMealTime(dto.getMealTime());
-		return DiaryMapper.diaryOutputMapping(diary);
+		return diaryDao.create(diary);
 	}
 
 	@Override
 	public Diary read(UUID uuid) {
-		return diaryDao.read(uuid);
-	}
-
-	public List<Diary> get() {
-		return diaryDao.findAll(null, null, null, null);
-	}
-
-	@Override
-	public Diary update(UUID uuid, LocalDateTime dtUpdate, DiaryDTO dto) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public void delete(UUID uuid, LocalDateTime dtUpdate) {
-		// TODO Auto-generated method stub
-
+		return diaryDao.findByUuid(uuid);
 	}
 
 	@Override
 	public Page<Diary> get(Integer amount, Integer skip, List<Sorting> sortings, List<Filtering> filters) {
-		// TODO Auto-generated method stub
-		return null;
+		Page<Diary> page = new Page<>();
+		page.setContent(diaryDao.findAll(amount, skip, sortings, filters));
+		page.setPageSize(amount);
+		int count = diaryDao.count(filters);
+		page.setTotalElements(count);
+		int pageSize = count / (amount.intValue() == 0 ? 1 : amount.intValue());
+		if (count % (amount.intValue() == 0 ? 1 : amount.intValue()) > 0) {
+			pageSize++;
+		}
+		int currentPage = skip.intValue() / amount.intValue();
+		page.setPageNumber(currentPage);
+		page.setTotalPages(pageSize);
+		page.setFirst(skip == 0);
+		page.setLast(currentPage == pageSize);
+		return page;
+	}
+
+	@Override
+	public Diary update(UUID uuid, LocalDateTime dtUpdate, DiaryDTO dto) {
+		Diary readed = diaryDao.findByUuid(uuid);
+
+		if (readed == null) {
+			throw new IllegalArgumentException("Позиция не найдена");
+		}
+
+//		if (!readed.getDtUpdate().isEqual(dtUpdate)) {
+//			throw new IllegalArgumentException("К сожалению позиция уже была отредактирована кем-то другим");
+//		}
+
+		readed.setDtUpdate(LocalDateTime.now());
+		readed.setWeight(dto.getWeight());
+		readed.setProduct(productService.read(dto.getProductUuid()));
+		readed.setDish(dishService.read(dto.getDishUuid()));
+		readed.setMealTime(dto.getMealTime());
+
+		return diaryDao.create(readed);
+	}
+
+	@Override
+	public void delete(UUID uuid, LocalDateTime dtUpdate) {
+		diaryDao.delete(uuid, dtUpdate);
+
 	}
 
 }

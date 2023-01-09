@@ -43,28 +43,35 @@ public class User implements IEntity {
 
 	@Id
 	private UUID uuid;
+	
 	@Column(name = "dt_create")
 	@JsonSerialize(using = CustomLocalDateTimeSerializer.class)
 	@JsonDeserialize(using = CustomLocalDateTimeDesSerializer.class)
 	private LocalDateTime dtCreate;
+	
 	@Column(name = "dt_update")
 	@Version
 	@JsonSerialize(using = CustomLocalDateTimeSerializer.class)
 	@JsonDeserialize(using = CustomLocalDateTimeDesSerializer.class)
 	private LocalDateTime dtUpdate;
+	
 	@Column(length = 50)
 	private String email;
+	
 	@Column(length = 20)
 	private String username;
+	
 	@Column
 	@Enumerated(EnumType.STRING)
 	@ManyToMany(fetch = FetchType.LAZY)
 	@JoinTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_uuid"), inverseJoinColumns = @JoinColumn(name = "role_id"))
 	private Set<Role> roles = new HashSet<>();
 	// private ROLE role;
+	
 	@Column
 	@Enumerated(EnumType.STRING)
 	private USERSTATUS status;
+	
 	@Column(length = 120)
 	private String password;
 
@@ -84,6 +91,7 @@ public class User implements IEntity {
 		this.status = status;
 		this.password = password;
 	}
+
 
 	public User(String email, String username, String password) {
 		this.email = email;
@@ -131,6 +139,8 @@ public class User implements IEntity {
 		this.username = username;
 	}
 
+	
+
 	public Set<Role> getRoles() {
 		return roles;
 	}
@@ -168,7 +178,7 @@ public class User implements IEntity {
 		builder.append(email);
 		builder.append(", username=");
 		builder.append(username);
-		builder.append(", roles=");
+		builder.append(", role=");
 		builder.append(roles);
 		builder.append(", status=");
 		builder.append(status);

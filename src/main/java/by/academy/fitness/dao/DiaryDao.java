@@ -1,11 +1,10 @@
 package by.academy.fitness.dao;
 
-import java.time.LocalDateTime;
-import java.util.List;
 import java.util.UUID;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.criteria.CriteriaUpdate;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -13,12 +12,12 @@ import org.springframework.stereotype.Repository;
 import by.academy.fitness.dao.interf.IDiaryDao;
 import by.academy.fitness.domain.entity.Diary;
 @Repository
-public class DiaryDao implements IDiaryDao {
+public class DiaryDao extends BaseEntityDAO<UUID, Diary>  implements IDiaryDao {
 
 	@PersistenceContext
 	private final EntityManager entityManager;
 	
-	private static final String SELECT_SQL = "SELECT * from app.diary ORDER BY dt_create";
+	//private static final String SELECT_SQL = "SELECT * from app.diary ORDER BY dt_create";
 	
 	@Autowired
 
@@ -28,54 +27,19 @@ public class DiaryDao implements IDiaryDao {
 	}
 
 	@Override
-	public Diary create(Diary item) {
-		try {
-			entityManager.persist(item);
-			return item;
-		} catch (Exception e) {
-			throw new RuntimeException("При сохранении данных произошла ошибка", e);
-		}
-	}
-
-	public Diary read(UUID uuid) {
-		try {
-			Diary diary = entityManager.find(Diary.class, uuid);
-			if (diary == null) {
-				throw new Exception("Такой записи не существует");
-			}
-			return diary;
-		} catch (Exception e) {
-			throw new RuntimeException("При чтении данных произошла ошибка", e);
-		}
-	}
-
-	public List<Diary> get() {
-		return entityManager.createNativeQuery(SELECT_SQL, Diary.class).getResultList();
+	protected void updateFields(CriteriaUpdate<Diary> criteria, Diary entity) {
+		criteria.set("dt_update", entity.getDtUpdate());
+		criteria.set("product_uuid", entity.getProduct());
+		criteria.set("dish_uuid", entity.getDish());
+		criteria.set("weight", entity.getWeight());
+		criteria.set("meal_time", entity.getMealTime());
 	}
 
 	@Override
-	public Diary update(UUID uuid, LocalDateTime dtUpdate, Diary type) {
-		// TODO Auto-generated method stub
-		return null;
+	protected Class<Diary> getClazz() {
+		return Diary.class;
 	}
 
-	@Override
-	public void delete(UUID uuid, LocalDateTime dtUpdate) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public Diary findByUuid(UUID uuid) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public List<Diary> findAll(Integer amount, Integer skip, List<Sorting> sortings, List<Filtering> filters) {
-		// TODO Auto-generated method stub
-		return null;
-	}
 	
 	
 }

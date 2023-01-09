@@ -1,7 +1,8 @@
 package by.academy.fitness.controllers;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
-import java.util.List;
+import java.time.ZoneId;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,9 +17,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import by.academy.fitness.config.TimeConverter;
 import by.academy.fitness.domain.dto.DiaryDTO;
+import by.academy.fitness.domain.dto.PaginationContextDTO;
 import by.academy.fitness.domain.entity.Diary;
+import by.academy.fitness.domain.entity.Page;
 import by.academy.fitness.service.DiaryService;
 
 @RestController
@@ -38,9 +40,10 @@ public class DiaryController {
 		return ResponseEntity.ok(diaryService.read(uuid));
 	}
 
-	@GetMapping
-	protected ResponseEntity<List<Diary>> getList() {
-		return ResponseEntity.ok(diaryService.get());
+	@PostMapping(value = "/pagination")
+	protected ResponseEntity<Page<Diary>> getList(@RequestBody PaginationContextDTO paging) {
+		Page<Diary> page = diaryService.get(paging.getAmount(), paging.getSkip(), paging.getSortings(), paging.getFilters());
+		return ResponseEntity.ok(page);
 	}
 
 	@PostMapping
@@ -52,18 +55,18 @@ public class DiaryController {
 	@PutMapping(value = "/{uuid}/dtUpdate/{dt_update}")
 	protected ResponseEntity<Diary> doPut(@PathVariable UUID uuid, @PathVariable("dt_update") long dtUpdateRow,
 			@RequestBody DiaryDTO data) {
-		// LocalDateTime dtUpdate =
-		// LocalDateTime.ofInstant(Instant.ofEpochMilli(dtUpdateRow), ZoneId.of("UTC"));
-		LocalDateTime dtUpdate = TimeConverter.convert(dtUpdateRow);
+		 LocalDateTime dtUpdate =
+		 LocalDateTime.ofInstant(Instant.ofEpochMilli(dtUpdateRow), ZoneId.of("UTC"));
+		//LocalDateTime dtUpdate = TimeConverter.convert(dtUpdateRow);
 		return ResponseEntity.ok(this.diaryService.update(uuid, dtUpdate, data));
 	}
 
 	@DeleteMapping(value = "/{uuid}/dtUpdate/{dt_update}")
 	protected ResponseEntity<?> doDelete(@PathVariable UUID uuid, @PathVariable("dt_update") long dtUpdateRow,
 			@RequestBody DiaryDTO data) {
-		// LocalDateTime dtUpdate =
-		// LocalDateTime.ofInstant(Instant.ofEpochMilli(dtUpdateRow), ZoneId.of("UTC"));
-		LocalDateTime dtUpdate = TimeConverter.convert(dtUpdateRow);
+		 LocalDateTime dtUpdate =
+		 LocalDateTime.ofInstant(Instant.ofEpochMilli(dtUpdateRow), ZoneId.of("UTC"));
+	//	LocalDateTime dtUpdate = TimeConverter.convert(dtUpdateRow);
 		diaryService.delete(uuid, dtUpdate);
 		return new ResponseEntity<>(HttpStatus.OK);
 	}

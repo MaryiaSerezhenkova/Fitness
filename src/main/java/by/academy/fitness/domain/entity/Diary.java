@@ -110,7 +110,7 @@ public class Diary implements IEntity {
 		return weight;
 	}
 
-	public void setWeight(int dishWeight) {
+	public void setWeight(int weight) {
 		this.weight = weight;
 	}
 
@@ -122,9 +122,6 @@ public class Diary implements IEntity {
 		this.mealTime = mealTime;
 	}
 
-	public static long getSerialversionuid() {
-		return serialVersionUID;
-	}
 
 	@Override
 	public String toString() {

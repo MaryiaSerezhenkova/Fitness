@@ -15,22 +15,26 @@ import by.academy.fitness.domain.builders.ProductMapper;
 import by.academy.fitness.domain.dto.ProductDTO;
 import by.academy.fitness.domain.entity.Page;
 import by.academy.fitness.domain.entity.Product;
+import by.academy.fitness.domain.validators.ProductValidator;
 import by.academy.fitness.service.interf.IProductService;
 
 @Service
 public class ProductService implements IProductService {
 
 	private final ProductDao productDao;
+	private final ProductValidator validator;
 
 	@Autowired
-	public ProductService(ProductDao productDao) {
+	public ProductService(ProductDao productDao, ProductValidator validator) {
 		super();
 		this.productDao = productDao;
+		this.validator = validator;
 	}
 
 	@Transactional
 	@Override
 	public Product create(ProductDTO dto) {
+		validator.validate(dto);
 		Product product = ProductMapper.productInputMapping(dto);
 		product.setUuid(UUID.randomUUID());
 		product.setDtCreate(LocalDateTime.now());
@@ -82,10 +86,10 @@ public class ProductService implements IProductService {
 			throw new IllegalArgumentException("Позиция не найдена");
 		}
 
-		if (!readed.getDtUpdate().isEqual(dtUpdate)) {
-			throw new IllegalArgumentException("К сожалению позиция уже была отредактирована кем-то другим");
-		}
-
+//		if (!readed.getDtUpdate().isEqual(dtUpdate)) {
+//			throw new IllegalArgumentException("К сожалению позиция уже была отредактирована кем-то другим");
+//		}
+        validator.validate(dto);
 		readed.setDtUpdate(LocalDateTime.now());
 		readed.setName(dto.getName());
 		readed.setWeight(dto.getWeight());
@@ -95,7 +99,7 @@ public class ProductService implements IProductService {
 		readed.setFats(dto.getFats());
 		readed.setCarbohydrates(dto.getCarbohydrates());
 
-		return productDao.update(uuid, dtUpdate, readed);
+		return productDao.create(readed);
 	}
 
 	@Transactional

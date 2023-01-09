@@ -3,6 +3,7 @@ package by.academy.fitness.controllers;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.TimeZone;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +18,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import by.academy.fitness.config.TimeConverter;
 import by.academy.fitness.domain.dto.PaginationContextDTO;
 import by.academy.fitness.domain.dto.ProductDTO;
 import by.academy.fitness.domain.entity.Page;
@@ -69,7 +69,7 @@ public class ProductController {
 	protected ResponseEntity<?> doDelete(@PathVariable UUID uuid, @PathVariable("dt_update") long dtUpdateRow,
 			@RequestBody ProductDTO data) {
 		 LocalDateTime dtUpdate =
-		 LocalDateTime.ofInstant(Instant.ofEpochMilli(dtUpdateRow), ZoneId.of("UTC"));
+		 LocalDateTime.ofInstant(Instant.ofEpochMilli(dtUpdateRow), TimeZone.getDefault().toZoneId());
 		productService.delete(uuid, dtUpdate);
 		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 	}

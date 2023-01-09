@@ -17,6 +17,7 @@ import by.academy.fitness.domain.dto.IngredientDTO;
 import by.academy.fitness.domain.entity.Dish;
 import by.academy.fitness.domain.entity.Ingredient;
 import by.academy.fitness.domain.entity.Page;
+import by.academy.fitness.domain.validators.DishValidator;
 import by.academy.fitness.service.interf.IDishService;
 
 @Service
@@ -24,18 +25,21 @@ public class DishService implements IDishService {
 
 	private final DishDao dishDao;
 	private final ProductService productService;
+	private final DishValidator validator;
 
 	@Autowired
-	public DishService(DishDao dishDao, ProductService productService) {
+	public DishService(DishDao dishDao, ProductService productService, DishValidator validator) {
 		super();
 		this.dishDao = dishDao;
 		this.productService = productService;
+		this.validator=validator;
 	}
 
 	@Transactional
 	@Override
 	public Dish create(DishDTO dto) {
 		Dish dish = new Dish();
+		validator.validate(dto);
 		dish.setUuid(UUID.randomUUID());
 		dish.setDtCreate(LocalDateTime.now());
 		dish.setDtUpdate(dish.getDtCreate());
@@ -68,10 +72,10 @@ public class DishService implements IDishService {
 			throw new IllegalArgumentException("Позиция не найдена");
 		}
 
-		if (!readed.getDtUpdate().isEqual(dtUpdate)) {
-			throw new IllegalArgumentException("К сожалению позиция уже была отредактирована кем-то другим");
-		}
-
+//		if (!readed.getDtUpdate().isEqual(dtUpdate)) {
+//			throw new IllegalArgumentException("К сожалению позиция уже была отредактирована кем-то другим");
+//		}
+		validator.validate(dto);
 		readed.setDtUpdate(LocalDateTime.now());
 		readed.setName(dto.getName());
 		List<Ingredient> ingr = new ArrayList<>();
@@ -84,7 +88,7 @@ public class DishService implements IDishService {
 		}
 		readed.setIngredients(ingr);
 
-		return dishDao.update(uuid, dtUpdate, readed);
+		return dishDao.create(readed);
 	}
 
 	@Transactional
@@ -102,10 +106,15 @@ public class DishService implements IDishService {
 			page.setPageSize(amount);
 			int count = dishDao.count(filters);
 			page.setTotalElements(count);
-			page.setTotalPages(count/amount);
+			int pageSize = count / (amount.intValue() == 0 ? 1 : amount.intValue());
+			if (count % (amount.intValue() == 0 ? 1 : amount.intValue()) > 0) {
+				pageSize++;
+			}
+			int currentPage = skip.intValue()/amount.intValue();
+			page.setPageNumber(currentPage);
+			page.setTotalPages(pageSize);
 			page.setFirst(skip == 0);
-			page.setLast(count%skip<amount);
-
+			page.setLast(currentPage==pageSize);
 			return page;
 	}
 

@@ -2,7 +2,6 @@ package by.academy.fitness.domain.dto;
 
 import java.util.List;
 
-import org.hibernate.annotations.Filters;
 
 import by.academy.fitness.dao.Filtering;
 import by.academy.fitness.dao.Sorting;
