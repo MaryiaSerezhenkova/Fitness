@@ -45,7 +45,7 @@ public class Diary implements IEntity {
 	private Dish dish;
 	@Column
 	private int weight;
-	@Column
+	@Column (name = "meal_time")
 	@JsonSerialize(using = CustomLocalDateTimeSerializer.class)
 	@JsonDeserialize(using = CustomLocalDateTimeDesSerializer.class)
 	private LocalDateTime mealTime;
