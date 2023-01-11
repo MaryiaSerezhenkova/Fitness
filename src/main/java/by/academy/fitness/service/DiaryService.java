@@ -6,6 +6,7 @@ import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import by.academy.fitness.dao.DiaryDao;
 import by.academy.fitness.dao.Filtering;
@@ -31,24 +32,29 @@ public class DiaryService implements IDiaryService {
 		this.dishService = dishService;
 	}
 
+	@Transactional
 	@Override
 	public Diary create(DiaryDTO dto) {
 		Diary diary = new Diary();
 		diary.setUuid(UUID.randomUUID());
 		diary.setDtCreate(LocalDateTime.now());
 		diary.setDtUpdate(diary.getDtCreate());
-		diary.setDish(dishService.read(dto.getDishUuid()));
-		diary.setProduct(productService.read(dto.getProductUuid()));
+		if (dto.getDishUuid()!=null) {
+		diary.setDish(dishService.read(dto.getDishUuid()));}
+		if (dto.getProductUuid()!=null) {
+		diary.setProduct(productService.read(dto.getProductUuid()));}
 		diary.setWeight(dto.getWeight());
 		diary.setMealTime(dto.getMealTime());
 		return diaryDao.create(diary);
 	}
 
+	@Transactional
 	@Override
 	public Diary read(UUID uuid) {
 		return diaryDao.findByUuid(uuid);
 	}
 
+	@Transactional
 	@Override
 	public Page<Diary> get(Integer amount, Integer skip, List<Sorting> sortings, List<Filtering> filters) {
 		Page<Diary> page = new Page<>();
@@ -64,10 +70,17 @@ public class DiaryService implements IDiaryService {
 		page.setPageNumber(currentPage);
 		page.setTotalPages(pageSize);
 		page.setFirst(skip == 0);
-		page.setLast(currentPage == pageSize);
+		page.setLast((count - skip) <= amount);
+		;
+		int numberOfEl = amount;
+		if (amount > (count - skip)) {
+			numberOfEl = count - skip;
+		}
+		page.setNumberOfElements(numberOfEl);
 		return page;
 	}
 
+	@Transactional
 	@Override
 	public Diary update(UUID uuid, LocalDateTime dtUpdate, DiaryDTO dto) {
 		Diary readed = diaryDao.findByUuid(uuid);
@@ -89,6 +102,7 @@ public class DiaryService implements IDiaryService {
 		return diaryDao.create(readed);
 	}
 
+	@Transactional
 	@Override
 	public void delete(UUID uuid, LocalDateTime dtUpdate) {
 		diaryDao.delete(uuid, dtUpdate);

@@ -114,7 +114,12 @@ public class DishService implements IDishService {
 			page.setPageNumber(currentPage);
 			page.setTotalPages(pageSize);
 			page.setFirst(skip == 0);
-			page.setLast(currentPage==pageSize);
+			page.setLast((count-skip)<=amount);;
+			int numberOfEl = amount;
+			if (amount>(count-skip)) {
+				numberOfEl=count-skip;
+			}
+			page.setNumberOfElements(numberOfEl);
 			return page;
 	}
 

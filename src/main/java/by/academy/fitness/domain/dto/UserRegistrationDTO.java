@@ -1,9 +1,13 @@
 package by.academy.fitness.domain.dto;
 
-public class UserRegistrationDTO {
+import javax.validation.constraints.NotBlank;
 
+public class UserRegistrationDTO {
+	@NotBlank(message = "Email is mandatory")
 	private String email;
+	@NotBlank(message = "Name is mandatory")
 	private String username;
+	
 	private String password;
 
 	public UserRegistrationDTO() {

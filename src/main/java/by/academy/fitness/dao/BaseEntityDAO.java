@@ -7,6 +7,7 @@ import java.util.UUID;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityNotFoundException;
+import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaDelete;
@@ -25,6 +26,7 @@ import by.academy.fitness.domain.entity.IEntity;
 public abstract class BaseEntityDAO<I, E extends IEntity> implements IDao<E> {
 
 	@Autowired
+	@PersistenceContext
 	private EntityManager entityManager;
 
 	public E find(UUID uuid, LocalDateTime dtUpdate) {

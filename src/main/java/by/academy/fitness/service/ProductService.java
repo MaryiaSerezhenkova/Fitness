@@ -64,17 +64,14 @@ public class ProductService implements IProductService {
 		page.setPageNumber(currentPage);
 		page.setTotalPages(pageSize);
 		page.setFirst(skip == 0);
-		page.setLast(currentPage==pageSize);
+		page.setLast((count-skip)<=amount);;
+		int numberOfEl = amount;
+		if (amount>(count-skip)) {
+			numberOfEl=count-skip;
+		}
+		page.setNumberOfElements(numberOfEl);
 		return page;
 
-//		private int pageNumber;
-//		private int pageSize;
-//		private int totalPages;
-//		private int totalElements;
-//		private boolean first;
-//		private int numberOfElements;
-//		private boolean last;
-//		private List<E> content;
 	}
 
 	@Transactional

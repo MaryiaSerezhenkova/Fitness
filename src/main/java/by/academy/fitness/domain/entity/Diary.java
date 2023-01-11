@@ -37,11 +37,11 @@ public class Diary implements IEntity {
 	@JsonSerialize(using = CustomLocalDateTimeSerializer.class)
 	@JsonDeserialize(using = CustomLocalDateTimeDesSerializer.class)
 	private LocalDateTime dtUpdate;
-	@ManyToOne
-	@JoinColumn(name = "product_uuid", referencedColumnName = "uuid")
+	@ManyToOne ( optional = true)
+	@JoinColumn(name = "product_uuid", nullable = true, referencedColumnName = "uuid")
 	private Product product;
-	@ManyToOne
-	@JoinColumn(name = "dish_uuid", referencedColumnName = "uuid")
+	@ManyToOne ( optional = true)
+	@JoinColumn(name = "dish_uuid", nullable = true, referencedColumnName = "uuid")
 	private Dish dish;
 	@Column
 	private int weight;
