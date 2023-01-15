@@ -19,7 +19,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import by.academy.fitness.config.CustomLocalDateTimeDesSerializer;
 import by.academy.fitness.config.CustomLocalDateTimeSerializer;
 @Entity
-@Table(name = "users", schema = "app")
+@Table(name = "profile", schema = "app")
 public class Profile implements IEntity {
 	
 	

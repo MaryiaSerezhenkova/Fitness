@@ -11,10 +11,10 @@ import org.springframework.transaction.annotation.Transactional;
 import by.academy.fitness.dao.DiaryDao;
 import by.academy.fitness.dao.Filtering;
 import by.academy.fitness.dao.Sorting;
-import by.academy.fitness.domain.builders.DiaryMapper;
 import by.academy.fitness.domain.dto.DiaryDTO;
 import by.academy.fitness.domain.entity.Diary;
 import by.academy.fitness.domain.entity.Page;
+import by.academy.fitness.domain.validators.DiaryValidator;
 import by.academy.fitness.service.interf.IDiaryService;
 
 @Service
@@ -23,19 +23,22 @@ public class DiaryService implements IDiaryService {
 	private final DiaryDao diaryDao;
 	private final ProductService productService;
 	private final DishService dishService;
+	private final DiaryValidator validator;
 
 	@Autowired
-	public DiaryService(DiaryDao diaryDao, ProductService productService, DishService dishService) {
+	public DiaryService(DiaryDao diaryDao, ProductService productService, DishService dishService, DiaryValidator validator) {
 		super();
 		this.diaryDao = diaryDao;
 		this.productService = productService;
 		this.dishService = dishService;
+		this.validator=validator;
 	}
 
 	@Transactional
 	@Override
 	public Diary create(DiaryDTO dto) {
 		Diary diary = new Diary();
+		validator.validate(dto);
 		diary.setUuid(UUID.randomUUID());
 		diary.setDtCreate(LocalDateTime.now());
 		diary.setDtUpdate(diary.getDtCreate());
@@ -84,6 +87,7 @@ public class DiaryService implements IDiaryService {
 	@Override
 	public Diary update(UUID uuid, LocalDateTime dtUpdate, DiaryDTO dto) {
 		Diary readed = diaryDao.findByUuid(uuid);
+		
 
 		if (readed == null) {
 			throw new IllegalArgumentException("Позиция не найдена");
@@ -92,11 +96,13 @@ public class DiaryService implements IDiaryService {
 //		if (!readed.getDtUpdate().isEqual(dtUpdate)) {
 //			throw new IllegalArgumentException("К сожалению позиция уже была отредактирована кем-то другим");
 //		}
-
+		validator.validate(dto);
 		readed.setDtUpdate(LocalDateTime.now());
 		readed.setWeight(dto.getWeight());
-		readed.setProduct(productService.read(dto.getProductUuid()));
-		readed.setDish(dishService.read(dto.getDishUuid()));
+		if (dto.getProductUuid()!=null) { 
+		readed.setProduct(productService.read(dto.getProductUuid()));}
+		if (dto.getDishUuid()!=null) {
+		readed.setDish(dishService.read(dto.getDishUuid()));}
 		readed.setMealTime(dto.getMealTime());
 
 		return diaryDao.create(readed);

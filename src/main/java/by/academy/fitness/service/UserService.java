@@ -133,5 +133,13 @@ public class UserService implements IUserService {
 		readed.setStatus(status);
 		return userDao.update(uuid, dtUpdate, readed);
 	}
+	
+	public Boolean existsByEmail(String email) {
+		if (userDao.existsByEmail(email) == false) {
+			return false;
+
+		}
+		return true;
+	}
 
 }

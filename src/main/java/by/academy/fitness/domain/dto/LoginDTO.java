@@ -1,15 +1,20 @@
 package by.academy.fitness.domain.dto;
 
-public class UserLoginDTO {
+import javax.validation.constraints.NotBlank;
 
+public class LoginDTO {
+
+	@NotBlank(message = "Data is not valid")
 	private String email;
+	@NotBlank(message = "Data is not valid")
 	private String password;
 
-	public UserLoginDTO() {
+	public LoginDTO() {
 		super();
 	}
 
-	public UserLoginDTO(String email, String password) {
+	public LoginDTO(@NotBlank(message = "Data is not valid") String email,
+			@NotBlank(message = "Data is not valid") String password) {
 		super();
 		this.email = email;
 		this.password = password;
@@ -31,4 +36,5 @@ public class UserLoginDTO {
 		this.password = password;
 	}
 
+	
 }

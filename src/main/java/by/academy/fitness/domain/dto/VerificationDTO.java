@@ -1,11 +1,13 @@
 package by.academy.fitness.domain.dto;
 
+import javax.validation.constraints.NotBlank;
+
 public class VerificationDTO {
-
+	@NotBlank(message = "Data is not valid")
 	private String email;
-
+	@NotBlank(message = "Data is not valid")
 	private String password;
-
+	@NotBlank(message = "Data is not valid")
 	private String token;
 
 	public VerificationDTO() {
