@@ -8,6 +8,8 @@ import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Version;
 
@@ -56,13 +58,16 @@ public class Product implements IEntity {
 	private double fats;
 	@Column
 	private double carbohydrates;
+	@ManyToOne
+	@JoinColumn(name = "user_uuid", referencedColumnName = "uuid")
+	private User user;
 
 	public Product() {
 		super();
 	}
 
 	public Product(UUID uuid, LocalDateTime dtCreate, LocalDateTime dtUpdate, String name, int weight, UNIT unit,
-			int colories, double proteins, double fats, double carbohydrates) {
+			int colories, double proteins, double fats, double carbohydrates, User user) {
 		super();
 		this.uuid = uuid;
 		this.dtCreate = dtCreate;
@@ -74,6 +79,7 @@ public class Product implements IEntity {
 		this.proteins = proteins;
 		this.fats = fats;
 		this.carbohydrates = carbohydrates;
+		this.user = user;
 	}
 
 	public Product(String name, int weight, UNIT unit, int colories, double proteins, double fats,
@@ -167,6 +173,14 @@ public class Product implements IEntity {
 		this.carbohydrates = carbohydrates;
 	}
 
+	public User getUser() {
+		return user;
+	}
+
+	public void setUser(User user) {
+		this.user = user;
+	}
+
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
@@ -190,6 +204,8 @@ public class Product implements IEntity {
 		builder.append(fats);
 		builder.append(", carbohydrates=");
 		builder.append(carbohydrates);
+		builder.append(", user=");
+		builder.append(user);
 		builder.append("]");
 		return builder.toString();
 	}

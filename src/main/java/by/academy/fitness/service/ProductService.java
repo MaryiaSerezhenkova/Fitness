@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -13,32 +14,49 @@ import by.academy.fitness.dao.ProductDao;
 import by.academy.fitness.dao.Sorting;
 import by.academy.fitness.domain.builders.ProductMapper;
 import by.academy.fitness.domain.dto.ProductDTO;
+import by.academy.fitness.domain.entity.Audit;
+import by.academy.fitness.domain.entity.Audit.ESSENCETYPE;
 import by.academy.fitness.domain.entity.Page;
 import by.academy.fitness.domain.entity.Product;
+import by.academy.fitness.domain.entity.User;
 import by.academy.fitness.domain.validators.ProductValidator;
 import by.academy.fitness.service.interf.IProductService;
 
 @Service
 public class ProductService implements IProductService {
+	
+	private final static String CREATED = "Product created";
+	private final static String UPDATED = "Product updated";
+	private final static String DELETED = "Product deleted";
+	
 
 	private final ProductDao productDao;
 	private final ProductValidator validator;
+	private final UserService userService;
+	private final AuditService auditService;
 
 	@Autowired
-	public ProductService(ProductDao productDao, ProductValidator validator) {
+	public ProductService(ProductDao productDao, ProductValidator validator, UserService userService,
+			AuditService auditService) {
 		super();
 		this.productDao = productDao;
 		this.validator = validator;
+		this.userService = userService;
+		this.auditService = auditService;
 	}
 
 	@Transactional
 	@Override
 	public Product create(ProductDTO dto) {
+		User user = userService.findByEmail(SecurityContextHolder.getContext().getAuthentication().getName());
 		validator.validate(dto);
 		Product product = ProductMapper.productInputMapping(dto);
 		product.setUuid(UUID.randomUUID());
 		product.setDtCreate(LocalDateTime.now());
 		product.setDtUpdate(product.getDtCreate());
+		product.setUser(user);
+		auditService.create(new Audit(CREATED, ESSENCETYPE.PRODUCT, product.getName()),
+                user);
 		return ProductMapper.productOutputMapping(productDao.create(product));
 	}
 
@@ -60,14 +78,15 @@ public class ProductService implements IProductService {
 		if (count % (amount.intValue() == 0 ? 1 : amount.intValue()) > 0) {
 			pageSize++;
 		}
-		int currentPage = skip.intValue()/amount.intValue();
+		int currentPage = skip.intValue() / amount.intValue();
 		page.setPageNumber(currentPage);
 		page.setTotalPages(pageSize);
 		page.setFirst(skip == 0);
-		page.setLast((count-skip)<=amount);;
+		page.setLast((count - skip) <= amount);
+		;
 		int numberOfEl = amount;
-		if (amount>(count-skip)) {
-			numberOfEl=count-skip;
+		if (amount > (count - skip)) {
+			numberOfEl = count - skip;
 		}
 		page.setNumberOfElements(numberOfEl);
 		return page;
@@ -77,16 +96,20 @@ public class ProductService implements IProductService {
 	@Transactional
 	@Override
 	public Product update(UUID uuid, LocalDateTime dtUpdate, ProductDTO dto) {
+		User user = userService.findByEmail(SecurityContextHolder.getContext().getAuthentication().getName());
 		Product readed = productDao.findByUuid(uuid);
 
 		if (readed == null) {
-			throw new IllegalArgumentException("Позиция не найдена");
+			throw new IllegalArgumentException("Item not found");
+		}
+		if (!readed.getUser().equals(user)) {
+			throw new IllegalArgumentException("You can only update the product you created");	
 		}
 
 //		if (!readed.getDtUpdate().isEqual(dtUpdate)) {
-//			throw new IllegalArgumentException("К сожалению позиция уже была отредактирована кем-то другим");
+//			throw new IllegalArgumentException("Sorry, this item has already been edited by someone else");
 //		}
-        validator.validate(dto);
+		validator.validate(dto);
 		readed.setDtUpdate(LocalDateTime.now());
 		readed.setName(dto.getName());
 		readed.setWeight(dto.getWeight());
@@ -95,13 +118,21 @@ public class ProductService implements IProductService {
 		readed.setProteins(dto.getProteins());
 		readed.setFats(dto.getFats());
 		readed.setCarbohydrates(dto.getCarbohydrates());
-
+		readed.setUser(user);
+		auditService.create(new Audit(UPDATED, ESSENCETYPE.PRODUCT, readed.getName()),
+                user);
 		return productDao.create(readed);
 	}
 
 	@Transactional
 	@Override
 	public void delete(UUID uuid, LocalDateTime dtUpdate) {
+		User user = userService.findByEmail(SecurityContextHolder.getContext().getAuthentication().getName());
+		if (!productDao.findByUuid(uuid).getUser().equals(user)) {
+			throw new IllegalArgumentException("You can only delete the product you created");	
+		}
+		auditService.create(new Audit(DELETED, ESSENCETYPE.PRODUCT, uuid.toString()),
+                user);
 		productDao.delete(uuid, dtUpdate);
 
 	}

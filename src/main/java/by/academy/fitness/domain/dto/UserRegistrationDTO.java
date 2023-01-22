@@ -1,5 +1,7 @@
 package by.academy.fitness.domain.dto;
 
+import java.util.Set;
+
 import javax.validation.constraints.NotBlank;
 
 public class UserRegistrationDTO {
@@ -9,6 +11,19 @@ public class UserRegistrationDTO {
 	private String username;
 	@NotBlank(message = "Data is not valid")
 	private String password;
+	private Set<String> roles;
+
+	public Set<String> getRoles() {
+		return roles;
+	}
+
+	public void setRoles(Set<String> roles) {
+		this.roles = roles;
+	}
+
+	public void setUsername(String username) {
+		this.username = username;
+	}
 
 	public UserRegistrationDTO() {
 		super();

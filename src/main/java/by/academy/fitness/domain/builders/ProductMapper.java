@@ -13,6 +13,6 @@ public class ProductMapper {
 
 	public static Product productOutputMapping(Product product) {
 		return new Product(product.getUuid(), product.getDtCreate(), product.getDtUpdate(), product.getName(),
-				product.getWeight(), product.getUnit(), product.getColories(), product.getProteins(), product.getFats(), product.getCarbohydrates());
+				product.getWeight(), product.getUnit(), product.getColories(), product.getProteins(), product.getFats(), product.getCarbohydrates(), product.getUser());
 	}
 }

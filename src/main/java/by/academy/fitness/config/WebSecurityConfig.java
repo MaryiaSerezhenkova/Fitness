@@ -1,5 +1,8 @@
 package by.academy.fitness.config;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -15,7 +18,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+
 import by.academy.fitness.domain.entity.User.ROLE;
+import by.academy.fitness.security.filters.CorsFilter;
 import by.academy.fitness.security.jwt.AuthEntryPointJwt;
 import by.academy.fitness.security.jwt.AuthTokenFilter;
 import by.academy.fitness.service.UserDetailsServiceImpl;
@@ -30,12 +35,14 @@ public class WebSecurityConfig {
 	private final UserDetailsServiceImpl userDetailsService;
 
 	private final AuthEntryPointJwt unauthorizedHandler;
+	private final CorsFilter corsFilter;
 
 	@Autowired
-	public WebSecurityConfig(UserDetailsServiceImpl userDetailsService, AuthEntryPointJwt unauthorizedHandler) {
+	public WebSecurityConfig(UserDetailsServiceImpl userDetailsService, AuthEntryPointJwt unauthorizedHandler, CorsFilter corsFilter) {
 		super();
 		this.userDetailsService = userDetailsService;
 		this.unauthorizedHandler = unauthorizedHandler;
+		this.corsFilter= corsFilter;
 	}
 
 	@Bean
@@ -65,15 +72,25 @@ public class WebSecurityConfig {
 
 	@Bean
 	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-		http.cors().and().csrf().disable().exceptionHandling().authenticationEntryPoint(unauthorizedHandler).and()
+		http.csrf().disable().exceptionHandling().authenticationEntryPoint(unauthorizedHandler).and()
 				.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and().authorizeRequests()
-				.antMatchers("/api/auth/**").permitAll().antMatchers("/api/admin/**").hasRole(ROLE.ADMIN.name().substring(5))
-                .anyRequest().authenticated();
+
+				.antMatchers("/api/auth/**").permitAll()
+
+				.antMatchers("/api/admin/**").hasRole(ROLE.ADMIN.name().substring(5)).anyRequest().authenticated();
 
 		http.authenticationProvider(authenticationProvider());
 
 		http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
+		http.addFilterBefore(corsFilter, UsernamePasswordAuthenticationFilter.class);
 
 		return http.build();
+	}
+	@Bean
+	protected SkipPathRequestMatcher skipPathRequestMatcher() throws Exception {
+		List<String> urls = new ArrayList<>();
+		urls.add("/signup");
+		urls.add("/signin");
+		return new SkipPathRequestMatcher(urls, "/api/auth");
 	}
 }

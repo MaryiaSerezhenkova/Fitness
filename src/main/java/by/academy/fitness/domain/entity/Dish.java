@@ -9,6 +9,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Version;
@@ -41,6 +42,9 @@ public class Dish implements IEntity {
 	@OneToMany (cascade=CascadeType.ALL, orphanRemoval = true)
 	@JoinColumn(name = "dish_uuid", referencedColumnName = "uuid")
 	private List<Ingredient> ingredients;
+	@ManyToOne
+    @JoinColumn(name = "user_uuid", referencedColumnName = "uuid")
+    private User user;
 
 	public Dish() {
 		super();
@@ -54,13 +58,16 @@ public class Dish implements IEntity {
 		this.name = name;
 	}
 
-	public Dish(UUID uuid, LocalDateTime dtCreate, LocalDateTime dtUpdate, String name, List<Ingredient> ingredients) {
+	
+	public Dish(UUID uuid, LocalDateTime dtCreate, LocalDateTime dtUpdate, String name, List<Ingredient> ingredients,
+			User user) {
 		super();
 		this.uuid = uuid;
 		this.dtCreate = dtCreate;
 		this.dtUpdate = dtUpdate;
 		this.name = name;
 		this.ingredients = ingredients;
+		this.user = user;
 	}
 
 	public Dish(String name, List<IngredientDTO> ingredients2) {
@@ -107,6 +114,14 @@ public class Dish implements IEntity {
 		this.ingredients = ingredients;
 	}
 
+	public User getUser() {
+		return user;
+	}
+
+	public void setUser(User user) {
+		this.user = user;
+	}
+
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
@@ -120,8 +135,12 @@ public class Dish implements IEntity {
 		builder.append(name);
 		builder.append(", ingredients=");
 		builder.append(ingredients);
+		builder.append(", user=");
+		builder.append(user);
 		builder.append("]");
 		return builder.toString();
 	}
+
+	
 
 }

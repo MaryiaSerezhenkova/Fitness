@@ -7,6 +7,7 @@ import javax.persistence.criteria.CriteriaUpdate;
 import org.springframework.stereotype.Repository;
 
 import by.academy.fitness.dao.interf.IVerificationDao;
+import by.academy.fitness.domain.entity.User;
 import by.academy.fitness.domain.entity.VerificationToken;
 @Repository
 public class VerificationDao extends BaseEntityDAO<UUID, VerificationToken> implements IVerificationDao {
@@ -22,5 +23,5 @@ public class VerificationDao extends BaseEntityDAO<UUID, VerificationToken> impl
 
 		return VerificationToken.class;
 	}
-
+	
 }

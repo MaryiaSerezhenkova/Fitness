@@ -14,7 +14,7 @@ public class DishMapper {
 	}
 
 	public static Dish dishOutputMapping(Dish dish) {
-		return new Dish(dish.getUuid(), dish.getDtCreate(), dish.getDtUpdate(), dish.getName(), dish.getIngredients());
+		return new Dish(dish.getUuid(), dish.getDtCreate(), dish.getDtUpdate(), dish.getName(), dish.getIngredients(), dish.getUser());
 	}
 
 }

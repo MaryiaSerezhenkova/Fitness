@@ -55,12 +55,7 @@ public class UserDao extends BaseEntityDAO<UUID, User> implements IUserDao {
 
 	@Override
 	public Boolean existsByUsername(String username) {
-		User user = findByUsername(username);
-		if (user == null) {
-			return false;
-
-		}
-		return true;
+		return findByUsername(username)!=null;
 	}
 
 	@Override
