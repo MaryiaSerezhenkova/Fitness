@@ -3,9 +3,7 @@ package by.academy.fitness.controllers;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.TimeZone;
 import java.util.UUID;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,52 +15,45 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import by.academy.fitness.domain.dto.PaginationContextDTO;
-import by.academy.fitness.domain.dto.UserRegistrationDTO;
-import by.academy.fitness.domain.entity.Page;
-import by.academy.fitness.domain.entity.User;
-import by.academy.fitness.service.UserService;
+import by.academy.fitness.domain.dto.ProfileDTO;
+import by.academy.fitness.domain.entity.Profile;
+import by.academy.fitness.service.ProfileService;
 
 @RestController
-@RequestMapping("/api/v1/users")
-public class UserController {
-	private final UserService userService;
+@RequestMapping("/api/v1/profile")
+public class ProfileController {
+
+	private final ProfileService profileService;
+
 	@Autowired
-	public UserController(UserService userService) {
+	public ProfileController(ProfileService profileService) {
 		super();
-		this.userService = userService;
+		this.profileService = profileService;
 	}
+
 	@GetMapping(value = "/{uuid}")
-	protected ResponseEntity<User> get(@PathVariable UUID uuid) {
-		return ResponseEntity.ok(userService.read(uuid));
-	}
-
-
-	@PostMapping(value = "/pagination")
-	protected ResponseEntity<Page<User>> getList(@RequestBody PaginationContextDTO paging) {
-		Page<User> page = userService.get(paging.getAmount(), paging.getSkip(), paging.getSortings(), paging.getFilters());
-		return ResponseEntity.ok(page);
+	protected ResponseEntity<Profile> get(@PathVariable UUID uuid) {
+		return ResponseEntity.ok(profileService.read(uuid));
 	}
 
 	@PostMapping
-	public ResponseEntity<User> doPost(@RequestBody UserRegistrationDTO data) {
-		User created = this.userService.create(data);
+	public ResponseEntity<Profile> doPost(@RequestBody ProfileDTO data) {
+		Profile created = this.profileService.create(data);
 		return new ResponseEntity<>(created, HttpStatus.CREATED);
 	}
 
 	@PutMapping(value = "/{uuid}/dtUpdate/{dt_update}")
-	protected ResponseEntity<User> doPut(@PathVariable UUID uuid, @PathVariable("dt_update") long dtUpdateRow,
-			@RequestBody UserRegistrationDTO data) {
+	protected ResponseEntity<Profile> doPut(@PathVariable UUID uuid, @PathVariable("dt_update") long dtUpdateRow,
+			@RequestBody ProfileDTO data) {
 		LocalDateTime dtUpdate = LocalDateTime.ofInstant(Instant.ofEpochMilli(dtUpdateRow), ZoneId.systemDefault());
-		return ResponseEntity.ok(this.userService.update(uuid, dtUpdate, data));
+		return ResponseEntity.ok(this.profileService.update(uuid, dtUpdate, data));
 	}
 
 	@DeleteMapping(value = "/{uuid}/dtUpdate/{dt_update}")
 	protected ResponseEntity<?> doDelete(@PathVariable UUID uuid, @PathVariable("dt_update") long dtUpdateRow,
-			@RequestBody UserRegistrationDTO data) {
+			@RequestBody ProfileDTO data) {
 		LocalDateTime dtUpdate = LocalDateTime.ofInstant(Instant.ofEpochMilli(dtUpdateRow), ZoneId.systemDefault());
-		userService.delete(uuid, dtUpdate);
+		profileService.delete(uuid, dtUpdate);
 		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 	}
 

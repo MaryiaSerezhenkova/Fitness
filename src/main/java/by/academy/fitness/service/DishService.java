@@ -85,14 +85,15 @@ public class DishService implements IDishService {
 		Dish readed = dishDao.findByUuid(uuid);
 
 		if (readed == null) {
-			throw new IllegalArgumentException("Позиция не найдена");
+			throw new IllegalArgumentException("Item not found");
 		}
 		if (!readed.getUser().equals(user)) {
-			throw new IllegalArgumentException("You can only update the product you created");
+			throw new IllegalArgumentException("You can only update the product you created");	
 		}
-//		if (!readed.getDtUpdate().isEqual(dtUpdate)) {
-//			throw new IllegalArgumentException("К сожалению позиция уже была отредактирована кем-то другим");
-//		}
+
+		if (!readed.getDtUpdate().isEqual(dtUpdate)) {
+			throw new IllegalArgumentException("Sorry, this item has already been edited");
+		}
 		validator.validate(dto);
 		readed.setDtUpdate(LocalDateTime.now());
 		readed.setName(dto.getName());

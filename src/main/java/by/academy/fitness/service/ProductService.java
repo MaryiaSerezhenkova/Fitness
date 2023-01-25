@@ -1,6 +1,7 @@
 package by.academy.fitness.service;
 
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.UUID;
 
@@ -52,7 +53,7 @@ public class ProductService implements IProductService {
 		validator.validate(dto);
 		Product product = ProductMapper.productInputMapping(dto);
 		product.setUuid(UUID.randomUUID());
-		product.setDtCreate(LocalDateTime.now());
+		product.setDtCreate(LocalDateTime.now().truncatedTo(ChronoUnit.MILLIS));
 		product.setDtUpdate(product.getDtCreate());
 		product.setUser(user);
 		auditService.create(new Audit(CREATED, ESSENCETYPE.PRODUCT, product.getName()),
@@ -106,11 +107,11 @@ public class ProductService implements IProductService {
 			throw new IllegalArgumentException("You can only update the product you created");	
 		}
 
-//		if (!readed.getDtUpdate().isEqual(dtUpdate)) {
-//			throw new IllegalArgumentException("Sorry, this item has already been edited by someone else");
-//		}
+		if (!readed.getDtUpdate().isEqual(dtUpdate)) {
+			throw new IllegalArgumentException("Sorry, this item has already been edited");
+		}
 		validator.validate(dto);
-		readed.setDtUpdate(LocalDateTime.now());
+		readed.setDtUpdate(LocalDateTime.now().truncatedTo(ChronoUnit.MILLIS));
 		readed.setName(dto.getName());
 		readed.setWeight(dto.getWeight());
 		readed.setUnit(dto.getUnit());
@@ -128,12 +129,21 @@ public class ProductService implements IProductService {
 	@Override
 	public void delete(UUID uuid, LocalDateTime dtUpdate) {
 		User user = userService.findByEmail(SecurityContextHolder.getContext().getAuthentication().getName());
-		if (!productDao.findByUuid(uuid).getUser().equals(user)) {
+		Product readed = productDao.findByUuid(uuid);
+		if (!readed.getUser().equals(user)) {
 			throw new IllegalArgumentException("You can only delete the product you created");	
 		}
+		if (readed == null) {
+			throw new IllegalArgumentException("Item not found");
+		}
+		if (!readed.getDtUpdate().isEqual(dtUpdate)) {
+			throw new IllegalArgumentException("Sorry, this item has already been edited");
+		}
+		
 		auditService.create(new Audit(DELETED, ESSENCETYPE.PRODUCT, uuid.toString()),
                 user);
 		productDao.delete(uuid, dtUpdate);
+		
 
 	}
 

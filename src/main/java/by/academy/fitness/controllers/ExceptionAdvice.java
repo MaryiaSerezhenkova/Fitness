@@ -33,6 +33,7 @@ public class ExceptionAdvice {
 		SingleErrorResponse response = new SingleErrorResponse();
 		response.setLogref("error");
 		response.setMessage(ex.getMessage());
+		ex.printStackTrace();
 		return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 
@@ -42,6 +43,7 @@ public class ExceptionAdvice {
 		SingleErrorResponse response = new SingleErrorResponse();
 		response.setLogref("error");
 		response.setMessage(ex.getMessage());
+		ex.printStackTrace();
 		return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
 	}
 
@@ -52,6 +54,7 @@ public class ExceptionAdvice {
 		SingleErrorResponse response = new SingleErrorResponse();
 		response.setLogref("error");
 		response.setMessage(ex.getMessage());
+		ex.printStackTrace();
 		return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
 	}
 
@@ -61,6 +64,7 @@ public class ExceptionAdvice {
 		SingleErrorResponse response = new SingleErrorResponse();
 		response.setLogref("error");
 		response.setMessage(ex.getMessage());
+		ex.printStackTrace();
 		return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 
@@ -70,6 +74,7 @@ public class ExceptionAdvice {
 		SingleErrorResponse response = new SingleErrorResponse();
 		response.setLogref("error");
 		response.setMessage(ex.getMessage());
+		ex.printStackTrace();
 		return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
 	}
 
@@ -79,6 +84,7 @@ public class ExceptionAdvice {
 		SingleErrorResponse response = new SingleErrorResponse();
 		response.setLogref("error");
 		response.setMessage(ex.getMessage());
+		ex.printStackTrace();
 		return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
 	}
 

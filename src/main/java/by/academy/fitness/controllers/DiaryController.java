@@ -55,18 +55,14 @@ public class DiaryController {
 	@PutMapping(value = "/{uuid}/dtUpdate/{dt_update}")
 	protected ResponseEntity<Diary> doPut(@PathVariable UUID uuid, @PathVariable("dt_update") long dtUpdateRow,
 			@RequestBody DiaryDTO data) {
-		 LocalDateTime dtUpdate =
-		 LocalDateTime.ofInstant(Instant.ofEpochMilli(dtUpdateRow), ZoneId.of("UTC"));
-		//LocalDateTime dtUpdate = TimeConverter.convert(dtUpdateRow);
+		LocalDateTime dtUpdate = LocalDateTime.ofInstant(Instant.ofEpochMilli(dtUpdateRow), ZoneId.systemDefault());
 		return ResponseEntity.ok(this.diaryService.update(uuid, dtUpdate, data));
 	}
 
 	@DeleteMapping(value = "/{uuid}/dtUpdate/{dt_update}")
 	protected ResponseEntity<?> doDelete(@PathVariable UUID uuid, @PathVariable("dt_update") long dtUpdateRow,
 			@RequestBody DiaryDTO data) {
-		 LocalDateTime dtUpdate =
-		 LocalDateTime.ofInstant(Instant.ofEpochMilli(dtUpdateRow), ZoneId.of("UTC"));
-	//	LocalDateTime dtUpdate = TimeConverter.convert(dtUpdateRow);
+		LocalDateTime dtUpdate = LocalDateTime.ofInstant(Instant.ofEpochMilli(dtUpdateRow), ZoneId.systemDefault());
 		diaryService.delete(uuid, dtUpdate);
 		return new ResponseEntity<>(HttpStatus.OK);
 	}

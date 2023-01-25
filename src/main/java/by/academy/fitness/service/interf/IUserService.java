@@ -13,5 +13,6 @@ public interface IUserService extends IService<User, UserRegistrationDTO> {
 	 User updateRole(UUID uuid, ROLE role, LocalDateTime dtUpdate);
 
 	 User updateStatus(UUID uuid, USERSTATUS status, LocalDateTime dtUpdate);
+	 User findByEmail (String email);
 
 }

@@ -37,18 +37,21 @@ public class Diary implements IEntity {
 	@JsonSerialize(using = CustomLocalDateTimeSerializer.class)
 	@JsonDeserialize(using = CustomLocalDateTimeDesSerializer.class)
 	private LocalDateTime dtUpdate;
-	@ManyToOne ( optional = true)
+	@ManyToOne(optional = true)
 	@JoinColumn(name = "product_uuid", nullable = true, referencedColumnName = "uuid")
 	private Product product;
-	@ManyToOne ( optional = true)
+	@ManyToOne(optional = true)
 	@JoinColumn(name = "dish_uuid", nullable = true, referencedColumnName = "uuid")
 	private Dish dish;
 	@Column
 	private int weight;
-	@Column (name = "meal_time")
+	@Column(name = "meal_time")
 	@JsonSerialize(using = CustomLocalDateTimeSerializer.class)
 	@JsonDeserialize(using = CustomLocalDateTimeDesSerializer.class)
 	private LocalDateTime mealTime;
+	@ManyToOne
+	@JoinColumn(name = "profile_uuid", referencedColumnName = "uuid")
+	private Profile profile;
 
 	public Diary() {
 		super();
@@ -122,6 +125,13 @@ public class Diary implements IEntity {
 		this.mealTime = mealTime;
 	}
 
+	public Profile getProfile() {
+		return profile;
+	}
+
+	public void setProfile(Profile profile) {
+		this.profile = profile;
+	}
 
 	@Override
 	public String toString() {
@@ -140,8 +150,11 @@ public class Diary implements IEntity {
 		builder.append(weight);
 		builder.append(", mealTime=");
 		builder.append(mealTime);
+		builder.append(", profile=");
+		builder.append(profile);
 		builder.append("]");
 		return builder.toString();
 	}
 
+	
 }

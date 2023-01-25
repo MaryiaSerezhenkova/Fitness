@@ -61,7 +61,8 @@ public class ProductController {
 	@PutMapping(value = "/{uuid}/dtUpdate/{dt_update}")
 	protected ResponseEntity<Product> doPut(@PathVariable UUID uuid, @PathVariable("dt_update") long dtUpdateRow,
 			@RequestBody ProductDTO data) {
-		LocalDateTime dtUpdate = LocalDateTime.ofInstant(Instant.ofEpochMilli(dtUpdateRow), ZoneId.of("UTC"));
+		LocalDateTime dtUpdate = LocalDateTime.ofInstant(Instant.ofEpochMilli(dtUpdateRow), ZoneId.systemDefault());
+		System.out.println(dtUpdate);
 		return ResponseEntity.ok(this.productService.update(uuid, dtUpdate, data));
 	}
 
@@ -69,7 +70,8 @@ public class ProductController {
 	protected ResponseEntity<?> doDelete(@PathVariable UUID uuid, @PathVariable("dt_update") long dtUpdateRow,
 			@RequestBody ProductDTO data) {
 		 LocalDateTime dtUpdate =
-		 LocalDateTime.ofInstant(Instant.ofEpochMilli(dtUpdateRow), TimeZone.getDefault().toZoneId());
+		 LocalDateTime.ofInstant(Instant.ofEpochMilli(dtUpdateRow), ZoneId.systemDefault());
+		 System.out.println(dtUpdate);
 		productService.delete(uuid, dtUpdate);
 		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 	}

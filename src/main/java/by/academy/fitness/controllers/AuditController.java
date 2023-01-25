@@ -28,18 +28,17 @@ public class AuditController {
 		super();
 		this.auditService = auditService;
 	}
+
 	@GetMapping(value = "/{uuid}")
 	protected ResponseEntity<Audit> get(@PathVariable UUID uuid) {
 		return ResponseEntity.ok(auditService.read(uuid));
 	}
-	 @GetMapping
-	    public ResponseEntity<Page> getList(
-	            @RequestParam int page,
-	            @RequestParam int size
-	    ) {
-	        Pageable pageable = PageRequest.of(page, size);
-	        Page<Audit> report = auditService.get(pageable);
 
-	        return new ResponseEntity<>(report, HttpStatus.OK);
-	    }
+	@GetMapping
+	public ResponseEntity<Page<Audit>> getList(@RequestParam int page, @RequestParam int size) {
+		Pageable pageable = PageRequest.of(page, size);
+		Page<Audit> report = auditService.get(pageable);
+
+		return new ResponseEntity<>(report, HttpStatus.OK);
+	}
 }

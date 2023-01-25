@@ -50,7 +50,7 @@ public class UserService implements IUserService {
 		user.setDtCreate(LocalDateTime.now());
 		user.setDtUpdate(user.getDtCreate());
 		user.setRoles(Set.of(role));
-		user.setStatus(USERSTATUS.ACTIVATED);
+		user.setStatus(USERSTATUS.WAITING_ACTIVATION);
 		user.setPassword(encoder.encode(dto.getPassword()));
 		return userDao.create(user);
 	}
@@ -96,7 +96,14 @@ public class UserService implements IUserService {
 		validator.validate(dto);
 		User readed = userDao.findByUuid(uuid);
 		if (readed == null) {
-			throw new IllegalArgumentException("Not found");
+			throw new IllegalArgumentException("Item not found");
+		}
+//		if (!readed.getUser().equals(user)) {
+//			throw new IllegalArgumentException("You can only update the product you created");	
+//		}
+
+		if (!readed.getDtUpdate().isEqual(dtUpdate)) {
+			throw new IllegalArgumentException("Sorry, this item has already been edited");
 		}
 		readed.setDtUpdate(LocalDateTime.now());
 		readed.setEmail(dto.getEmail());

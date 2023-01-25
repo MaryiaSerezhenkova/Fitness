@@ -87,6 +87,16 @@ public class Profile implements IEntity {
 	}
 
 
+	public Profile(int height, double weight, String dtBirthday, double target, ACTIVITY_TYPE type,
+			GENDER gender) {
+		this.height = height;
+		this.weight = weight;
+		this.dtBirthday = dtBirthday;
+		this.target = target;
+		this.type = type;
+		this.gender = gender;
+	}
+
 	public LocalDateTime getDtCreate() {
 		return dtCreate;
 	}

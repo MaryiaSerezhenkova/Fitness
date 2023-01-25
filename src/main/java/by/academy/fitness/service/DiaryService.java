@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -12,31 +13,45 @@ import by.academy.fitness.dao.DiaryDao;
 import by.academy.fitness.dao.Filtering;
 import by.academy.fitness.dao.Sorting;
 import by.academy.fitness.domain.dto.DiaryDTO;
+import by.academy.fitness.domain.entity.Audit;
+import by.academy.fitness.domain.entity.Audit.ESSENCETYPE;
 import by.academy.fitness.domain.entity.Diary;
 import by.academy.fitness.domain.entity.Page;
+import by.academy.fitness.domain.entity.User;
 import by.academy.fitness.domain.validators.DiaryValidator;
 import by.academy.fitness.service.interf.IDiaryService;
 
 @Service
 public class DiaryService implements IDiaryService {
+	private final static String CREATED = "Food diary entry created";
+	private final static String UPDATED = "Food diary entry updated";
+	private final static String DELETED = "Food diary entry deleted";
 
 	private final DiaryDao diaryDao;
 	private final ProductService productService;
 	private final DishService dishService;
 	private final DiaryValidator validator;
+	private final UserService userService;
+	private final AuditService auditService;
+	private final ProfileService profileService;
 
 	@Autowired
-	public DiaryService(DiaryDao diaryDao, ProductService productService, DishService dishService, DiaryValidator validator) {
+	public DiaryService(DiaryDao diaryDao, ProductService productService, DishService dishService,
+			DiaryValidator validator, UserService userService, AuditService auditService, ProfileService profileService) {
 		super();
 		this.diaryDao = diaryDao;
 		this.productService = productService;
 		this.dishService = dishService;
-		this.validator=validator;
-	}
+		this.validator = validator;
+		this.userService = userService;
+		this.auditService = auditService;
+		this.profileService=profileService;
+	}	
 
 	@Transactional
 	@Override
 	public Diary create(DiaryDTO dto) {
+		User user = userService.findByEmail(SecurityContextHolder.getContext().getAuthentication().getName());
 		Diary diary = new Diary();
 		validator.validate(dto);
 		diary.setUuid(UUID.randomUUID());
@@ -48,8 +63,12 @@ public class DiaryService implements IDiaryService {
 		diary.setProduct(productService.read(dto.getProductUuid()));}
 		diary.setWeight(dto.getWeight());
 		diary.setMealTime(dto.getMealTime());
+		auditService.create(new Audit(CREATED, ESSENCETYPE.DIARY, diary.getUuid().toString()),
+                user);
 		return diaryDao.create(diary);
 	}
+
+	
 
 	@Transactional
 	@Override
@@ -86,16 +105,20 @@ public class DiaryService implements IDiaryService {
 	@Transactional
 	@Override
 	public Diary update(UUID uuid, LocalDateTime dtUpdate, DiaryDTO dto) {
+		User user = userService.findByEmail(SecurityContextHolder.getContext().getAuthentication().getName());
 		Diary readed = diaryDao.findByUuid(uuid);
 		
 
 		if (readed == null) {
-			throw new IllegalArgumentException("Позиция не найдена");
+			throw new IllegalArgumentException("Item not found");
+		}
+		if (!readed.getProfile().getUser().equals(user)) {
+			throw new IllegalArgumentException("You can only update the product you created");	
 		}
 
-//		if (!readed.getDtUpdate().isEqual(dtUpdate)) {
-//			throw new IllegalArgumentException("К сожалению позиция уже была отредактирована кем-то другим");
-//		}
+		if (!readed.getDtUpdate().isEqual(dtUpdate)) {
+			throw new IllegalArgumentException("Sorry, this item has already been edited");
+		}
 		validator.validate(dto);
 		readed.setDtUpdate(LocalDateTime.now());
 		readed.setWeight(dto.getWeight());
@@ -104,6 +127,8 @@ public class DiaryService implements IDiaryService {
 		if (dto.getDishUuid()!=null) {
 		readed.setDish(dishService.read(dto.getDishUuid()));}
 		readed.setMealTime(dto.getMealTime());
+		auditService.create(new Audit(UPDATED, ESSENCETYPE.DIARY, readed.getUuid().toString()),
+                user);
 
 		return diaryDao.create(readed);
 	}
@@ -111,6 +136,9 @@ public class DiaryService implements IDiaryService {
 	@Transactional
 	@Override
 	public void delete(UUID uuid, LocalDateTime dtUpdate) {
+		User user = userService.findByEmail(SecurityContextHolder.getContext().getAuthentication().getName());
+		auditService.create(new Audit(DELETED, ESSENCETYPE.DIARY, diaryDao.findByUuid(uuid).getUuid().toString()),
+                user);
 		diaryDao.delete(uuid, dtUpdate);
 
 	}

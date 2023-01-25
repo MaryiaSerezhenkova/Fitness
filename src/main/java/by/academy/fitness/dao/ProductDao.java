@@ -2,11 +2,8 @@ package by.academy.fitness.dao;
 
 import java.util.UUID;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 import javax.persistence.criteria.CriteriaUpdate;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import by.academy.fitness.dao.interf.IProductDao;
@@ -14,16 +11,6 @@ import by.academy.fitness.domain.entity.Product;
 
 @Repository
 public class ProductDao extends BaseEntityDAO<UUID, Product> implements IProductDao {
-
-	@PersistenceContext
-	private final EntityManager entityManager;
-	//private static final String SELECT_SQL = "SELECT * from app.product ORDER BY dt_create";
-
-	@Autowired
-	public ProductDao(EntityManager entityManager) {
-		super();
-		this.entityManager = entityManager;
-	}
 
 	@Override
 	protected Class<Product> getClazz() {
@@ -40,7 +27,7 @@ public class ProductDao extends BaseEntityDAO<UUID, Product> implements IProduct
 		criteria.set("proteins", entity.getProteins());
 		criteria.set("fats", entity.getFats());
 		criteria.set("carbohydrates", entity.getCarbohydrates());
-	
+
 	}
 
 }
