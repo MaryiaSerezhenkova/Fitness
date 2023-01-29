@@ -6,6 +6,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
@@ -17,7 +18,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-
 
 import by.academy.fitness.domain.entity.User.ROLE;
 import by.academy.fitness.security.filters.CorsFilter;
@@ -38,11 +38,12 @@ public class WebSecurityConfig {
 	private final CorsFilter corsFilter;
 
 	@Autowired
-	public WebSecurityConfig(UserDetailsServiceImpl userDetailsService, AuthEntryPointJwt unauthorizedHandler, CorsFilter corsFilter) {
+	public WebSecurityConfig(UserDetailsServiceImpl userDetailsService, AuthEntryPointJwt unauthorizedHandler,
+			CorsFilter corsFilter) {
 		super();
 		this.userDetailsService = userDetailsService;
 		this.unauthorizedHandler = unauthorizedHandler;
-		this.corsFilter= corsFilter;
+		this.corsFilter = corsFilter;
 	}
 
 	@Bean
@@ -74,10 +75,14 @@ public class WebSecurityConfig {
 	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 		http.csrf().disable().exceptionHandling().authenticationEntryPoint(unauthorizedHandler).and()
 				.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and().authorizeRequests()
-
-				.antMatchers("/api/auth/**").permitAll()
-
-				.antMatchers("/api/admin/**").hasRole(ROLE.ADMIN.name().substring(5)).anyRequest().authenticated();
+				.antMatchers(HttpMethod.GET, "/api/v1/product").permitAll()
+				.antMatchers("/api/v1/users/signin").permitAll()
+				.antMatchers("/api/v1/users/signup").permitAll()
+				.antMatchers("/api/v1/users/verify/**").permitAll()
+				.antMatchers("/api/v1/users/me").hasAnyRole(ROLE.ADMIN.name().substring(5), ROLE.USER.name().substring(4))
+				.antMatchers("/api/v1/users/**").hasRole(ROLE.ADMIN.name().substring(5)).antMatchers("/api/v1/audit/**")
+				.hasRole(ROLE.ADMIN.name().substring(5))
+				.anyRequest().authenticated();
 
 		http.authenticationProvider(authenticationProvider());
 
@@ -86,11 +91,12 @@ public class WebSecurityConfig {
 
 		return http.build();
 	}
+
 	@Bean
 	protected SkipPathRequestMatcher skipPathRequestMatcher() throws Exception {
 		List<String> urls = new ArrayList<>();
 		urls.add("/signup");
 		urls.add("/signin");
-		return new SkipPathRequestMatcher(urls, "/api/auth");
+		return new SkipPathRequestMatcher(urls, "/api/v1/users");
 	}
 }

@@ -32,7 +32,7 @@ public class VerificationService implements IVerificationService {
 
 	@Override
 	public void sendMessage(String email, String token) {
-		String message = "To activate account follow the link " + "http://localhost:8080/api/auth/verify/"
+		String message = "To activate account follow the link " + "http://localhost:8080/api/v1/users/verify/"
 				+ token;
 		this.mailServiceImpl.sendSimpleMessage(email, "Activation code", message);
 	}

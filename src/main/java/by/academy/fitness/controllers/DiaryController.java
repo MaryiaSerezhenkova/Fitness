@@ -24,7 +24,7 @@ import by.academy.fitness.domain.entity.Page;
 import by.academy.fitness.service.DiaryService;
 
 @RestController
-@RequestMapping("/api/diary")
+@RequestMapping("/api/v1/profile/{profile_uuid}/diary")
 public class DiaryController {
 
 	private final DiaryService diaryService;
@@ -59,11 +59,4 @@ public class DiaryController {
 		return ResponseEntity.ok(this.diaryService.update(uuid, dtUpdate, data));
 	}
 
-	@DeleteMapping(value = "/{uuid}/dtUpdate/{dt_update}")
-	protected ResponseEntity<?> doDelete(@PathVariable UUID uuid, @PathVariable("dt_update") long dtUpdateRow,
-			@RequestBody DiaryDTO data) {
-		LocalDateTime dtUpdate = LocalDateTime.ofInstant(Instant.ofEpochMilli(dtUpdateRow), ZoneId.systemDefault());
-		diaryService.delete(uuid, dtUpdate);
-		return new ResponseEntity<>(HttpStatus.OK);
-	}
 }

@@ -28,7 +28,7 @@ import by.academy.fitness.service.UserService;
 import by.academy.fitness.service.VerificationService;
 
 @RestController
-@RequestMapping("/api/auth")
+@RequestMapping("api/v1/users")
 public class AuthController {
 
 	private final AuthenticationManager authenticationManager;

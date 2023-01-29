@@ -3,13 +3,11 @@ package by.academy.fitness.controllers;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.TimeZone;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -20,13 +18,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 import by.academy.fitness.domain.dto.DishDTO;
 import by.academy.fitness.domain.dto.PaginationContextDTO;
-import by.academy.fitness.domain.dto.ProductDTO;
 import by.academy.fitness.domain.entity.Dish;
 import by.academy.fitness.domain.entity.Page;
 import by.academy.fitness.service.DishService;
 
 @RestController
-@RequestMapping("/api/dish")
+@RequestMapping("/api/v1/dish")
 public class DishController {
 	
 	private final DishService dishService;
@@ -62,13 +59,6 @@ public class DishController {
 		return ResponseEntity.ok(this.dishService.update(uuid, dtUpdate, data));
 	}
 
-	@DeleteMapping(value="/{uuid}/dtUpdate/{dt_update}")
-	protected ResponseEntity<?> doDelete(@PathVariable UUID uuid, @PathVariable("dt_update") long dtUpdateRow,
-			@RequestBody ProductDTO data) {
-		LocalDateTime dtUpdate = LocalDateTime.ofInstant(Instant.ofEpochMilli(dtUpdateRow), ZoneId.systemDefault());
-		dishService.delete(uuid, dtUpdate);
-		return new ResponseEntity<>(HttpStatus.OK);
-	}
 }
 
 
