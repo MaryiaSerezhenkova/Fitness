@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,11 +26,10 @@ import by.academy.fitness.service.interf.IProductService;
 
 @Service
 public class ProductService implements IProductService {
-	
+
 	private final static String CREATED = "Product created";
 	private final static String UPDATED = "Product updated";
 	private final static String DELETED = "Product deleted";
-	
 
 	private final ProductDao productDao;
 	private final ProductValidator validator;
@@ -56,8 +56,7 @@ public class ProductService implements IProductService {
 		product.setDtCreate(LocalDateTime.now().truncatedTo(ChronoUnit.MILLIS));
 		product.setDtUpdate(product.getDtCreate());
 		product.setUser(user);
-		auditService.create(new Audit(CREATED, ESSENCETYPE.PRODUCT, product.getName()),
-                user);
+		auditService.create(new Audit(CREATED, ESSENCETYPE.PRODUCT, product.getName() + " " + product.getUuid()), user);
 		return ProductMapper.productOutputMapping(productDao.create(product));
 	}
 
@@ -104,7 +103,7 @@ public class ProductService implements IProductService {
 			throw new IllegalArgumentException("Item not found");
 		}
 		if (!readed.getUser().equals(user)) {
-			throw new IllegalArgumentException("You can only update the product you created");	
+			throw new IllegalArgumentException("You can only update the product you created");
 		}
 
 		if (!readed.getDtUpdate().isEqual(dtUpdate)) {
@@ -120,8 +119,7 @@ public class ProductService implements IProductService {
 		readed.setFats(dto.getFats());
 		readed.setCarbohydrates(dto.getCarbohydrates());
 		readed.setUser(user);
-		auditService.create(new Audit(UPDATED, ESSENCETYPE.PRODUCT, readed.getName()),
-                user);
+		auditService.create(new Audit(UPDATED, ESSENCETYPE.PRODUCT, readed.getName()), user);
 		return productDao.create(readed);
 	}
 
@@ -131,7 +129,7 @@ public class ProductService implements IProductService {
 		User user = userService.findByEmail(SecurityContextHolder.getContext().getAuthentication().getName());
 		Product readed = productDao.findByUuid(uuid);
 		if (!readed.getUser().equals(user)) {
-			throw new IllegalArgumentException("You can only delete the product you created");	
+			throw new IllegalArgumentException("You can only delete the product you created");
 		}
 		if (readed == null) {
 			throw new IllegalArgumentException("Item not found");
@@ -139,12 +137,14 @@ public class ProductService implements IProductService {
 		if (!readed.getDtUpdate().isEqual(dtUpdate)) {
 			throw new IllegalArgumentException("Sorry, this item has already been edited");
 		}
-		
-		auditService.create(new Audit(DELETED, ESSENCETYPE.PRODUCT, uuid.toString()),
-                user);
+
+		auditService.create(new Audit(DELETED, ESSENCETYPE.PRODUCT, uuid.toString()), user);
 		productDao.delete(uuid, dtUpdate);
-		
 
 	}
-
+	@Override
+	public Page<Product> get(Pageable pageable) {
+		Page<Product> items = (Page<Product>) productDao.getPage(pageable);
+		return items;
+	}
 }

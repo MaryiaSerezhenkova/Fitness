@@ -28,13 +28,16 @@ public class AuditService implements IAuditService {
 		audit.setUuid(UUID.randomUUID());
 		audit.setDtCreate(LocalDateTime.now().truncatedTo(ChronoUnit.MILLIS));
 		audit.setUser(user);
+		audit.setType(type.getType());
+		audit.setText(type.getText());
+		audit.setId(type.getId());
 		return auditDao.create(audit);
 	}
 
 	@Override
 	public Page<Audit> get(Pageable pageable) {
-		// TODO Auto-generated method stub
-		return null;
+		Page<Audit> items = (Page<Audit>) auditDao.getPage(pageable);
+		return items;
 	}
 
 	@Override

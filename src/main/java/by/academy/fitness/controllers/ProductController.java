@@ -6,6 +6,8 @@ import java.time.ZoneId;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,10 +16,12 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import by.academy.fitness.domain.dto.PaginationContextDTO;
 import by.academy.fitness.domain.dto.ProductDTO;
+import by.academy.fitness.domain.entity.Product;
 import by.academy.fitness.domain.entity.Page;
 import by.academy.fitness.domain.entity.Product;
 import by.academy.fitness.service.ProductService;
@@ -57,6 +61,13 @@ public class ProductController {
 		LocalDateTime dtUpdate = LocalDateTime.ofInstant(Instant.ofEpochMilli(dtUpdateRow), ZoneId.systemDefault());
 		System.out.println(dtUpdate);
 		return ResponseEntity.ok(this.productService.update(uuid, dtUpdate, data));
+	}
+	@GetMapping
+	public ResponseEntity<Page<Product>> getList(@RequestParam int page, @RequestParam int size) {
+		Pageable pageable = PageRequest.of(page, size);
+		Page<Product> report = productService.get(pageable);
+
+		return new ResponseEntity<>(report, HttpStatus.OK);
 	}
 
 }
