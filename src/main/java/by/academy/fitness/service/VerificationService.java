@@ -8,10 +8,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import by.academy.fitness.dao.VerificationDao;
+import by.academy.fitness.domain.builders.UserMapper;
 import by.academy.fitness.domain.dto.UserRegistrationDTO;
 import by.academy.fitness.domain.entity.User;
 import by.academy.fitness.domain.entity.User.USERSTATUS;
 import by.academy.fitness.domain.entity.VerificationToken;
+import by.academy.fitness.exceptions.ValidationException;
 import by.academy.fitness.security.filters.CryptoUtil;
 import by.academy.fitness.service.interf.IUserService;
 import by.academy.fitness.service.interf.IVerificationService;
@@ -44,7 +46,7 @@ public class VerificationService implements IVerificationService {
 		VerificationToken token = new VerificationToken();
 		token.setDtCreate(LocalDateTime.now());
 		token.setUuid(UUID.randomUUID());
-		token.setUser(user);
+		token.setUser(UserMapper.userUI(user));
 		token.setToken(CryptoUtil.encrypt("VerificationToken", token.getUuid().toString()+"|"+user.getEmail()));
 		verificationDao.create(token);
 		sendMessage(user.getEmail(), token.getToken());
@@ -57,12 +59,16 @@ public class VerificationService implements IVerificationService {
 		String info = CryptoUtil.decrypt("VerificationToken", token);
 		String[]parts = info.split("\\|");
 		if (parts.length!=2) {
-			//to do throw exception
+			throw new ValidationException("Invalid token");
 		}
 		User user = userService.findByEmail(parts[1]);
-		//if null
+		if (user==null) {
+			throw new ValidationException("User not found");
+		}
 		VerificationToken t = verificationDao.findByUuid(UUID.fromString(parts[0]));
-		//if null
+		if (token==null) {
+			throw new ValidationException("User not found");
+		}
 		if( t.getUser().equals(user)){
 			user.setStatus(USERSTATUS.ACTIVATED);
 			return true;

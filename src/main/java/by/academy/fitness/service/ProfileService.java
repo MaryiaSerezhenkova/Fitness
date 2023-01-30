@@ -14,6 +14,7 @@ import by.academy.fitness.dao.Filtering;
 import by.academy.fitness.dao.ProfileDao;
 import by.academy.fitness.dao.Sorting;
 import by.academy.fitness.domain.builders.ProfileMapper;
+import by.academy.fitness.domain.builders.UserMapper;
 import by.academy.fitness.domain.dto.ProfileDTO;
 import by.academy.fitness.domain.entity.Audit;
 import by.academy.fitness.domain.entity.Audit.ESSENCETYPE;
@@ -49,7 +50,7 @@ public class ProfileService implements IProfileService {
 		profile.setUuid(UUID.randomUUID());
 		profile.setDtCreate(LocalDateTime.now().truncatedTo(ChronoUnit.MILLIS));
 		profile.setDtUpdate(profile.getDtCreate());
-		profile.setUser(user);
+		profile.setUser(UserMapper.userUI(user));
 		auditService.create(new Audit(CREATED, ESSENCETYPE.PROFILE, profile.getUuid().toString()), user);
 		return ProfileMapper.profileOutputMapping(profileDao.create(profile));
 	}
@@ -91,7 +92,7 @@ public class ProfileService implements IProfileService {
 		readed.setTarget(dto.getTarget());
 		readed.setType(dto.getType());
 		readed.setGender(dto.getGender());
-		readed.setUser(user);
+		readed.setUser(UserMapper.userUI(user));
 		auditService.create(new Audit(UPDATED, ESSENCETYPE.PROFILE, readed.getUuid().toString()), user);
 		return profileDao.create(readed);
 	}
@@ -114,6 +115,11 @@ public class ProfileService implements IProfileService {
 		}
 		auditService.create(new Audit(DELETED, ESSENCETYPE.PROFILE, readed.getUuid().toString()), user);
 		profileDao.delete(uuid, dtUpdate);
+	}
+
+	@Override
+	public Profile findByUser(User user) {
+		return profileDao.findByUser(user);
 	}
 
 }

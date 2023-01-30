@@ -98,6 +98,13 @@ public class User implements IEntity {
 		this.password = password;
 	}
 
+	public User(UUID uuid, LocalDateTime dtCreate, LocalDateTime dtUpdate) {
+		super();
+		this.uuid = uuid;
+		this.dtCreate = dtCreate;
+		this.dtUpdate = dtUpdate;
+	}
+
 	public UUID getUuid() {
 		return uuid;
 	}

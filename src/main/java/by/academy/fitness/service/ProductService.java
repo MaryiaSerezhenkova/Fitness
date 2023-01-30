@@ -15,6 +15,7 @@ import by.academy.fitness.dao.Filtering;
 import by.academy.fitness.dao.ProductDao;
 import by.academy.fitness.dao.Sorting;
 import by.academy.fitness.domain.builders.ProductMapper;
+import by.academy.fitness.domain.builders.UserMapper;
 import by.academy.fitness.domain.dto.ProductDTO;
 import by.academy.fitness.domain.entity.Audit;
 import by.academy.fitness.domain.entity.Audit.ESSENCETYPE;
@@ -55,7 +56,7 @@ public class ProductService implements IProductService {
 		product.setUuid(UUID.randomUUID());
 		product.setDtCreate(LocalDateTime.now().truncatedTo(ChronoUnit.MILLIS));
 		product.setDtUpdate(product.getDtCreate());
-		product.setUser(user);
+		product.setUser(UserMapper.userUI(user));
 		auditService.create(new Audit(CREATED, ESSENCETYPE.PRODUCT, product.getName() + " " + product.getUuid()), user);
 		return ProductMapper.productOutputMapping(productDao.create(product));
 	}
@@ -118,7 +119,7 @@ public class ProductService implements IProductService {
 		readed.setProteins(dto.getProteins());
 		readed.setFats(dto.getFats());
 		readed.setCarbohydrates(dto.getCarbohydrates());
-		readed.setUser(user);
+		readed.setUser(UserMapper.userUI(user));
 		auditService.create(new Audit(UPDATED, ESSENCETYPE.PRODUCT, readed.getName()), user);
 		return productDao.create(readed);
 	}

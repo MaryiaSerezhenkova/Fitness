@@ -8,4 +8,7 @@ public class UserMapper {
 		return new User(dto.getEmail(), dto.getUsername(), dto.getPassword());
 	}
 
+	public static User userUI(User user) {
+		return new User(user.getUuid(), user.getDtCreate(), user.getDtUpdate());
+	}
 }

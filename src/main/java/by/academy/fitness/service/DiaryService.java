@@ -17,6 +17,7 @@ import by.academy.fitness.domain.entity.Audit;
 import by.academy.fitness.domain.entity.Audit.ESSENCETYPE;
 import by.academy.fitness.domain.entity.Diary;
 import by.academy.fitness.domain.entity.Page;
+import by.academy.fitness.domain.entity.Profile;
 import by.academy.fitness.domain.entity.User;
 import by.academy.fitness.domain.validators.DiaryValidator;
 import by.academy.fitness.service.interf.IDiaryService;
@@ -37,7 +38,8 @@ public class DiaryService implements IDiaryService {
 
 	@Autowired
 	public DiaryService(DiaryDao diaryDao, ProductService productService, DishService dishService,
-			DiaryValidator validator, UserService userService, AuditService auditService, ProfileService profileService) {
+			DiaryValidator validator, UserService userService, AuditService auditService,
+			ProfileService profileService) {
 		super();
 		this.diaryDao = diaryDao;
 		this.productService = productService;
@@ -45,8 +47,8 @@ public class DiaryService implements IDiaryService {
 		this.validator = validator;
 		this.userService = userService;
 		this.auditService = auditService;
-		this.profileService=profileService;
-	}	
+		this.profileService = profileService;
+	}
 
 	@Transactional
 	@Override
@@ -57,18 +59,18 @@ public class DiaryService implements IDiaryService {
 		diary.setUuid(UUID.randomUUID());
 		diary.setDtCreate(LocalDateTime.now());
 		diary.setDtUpdate(diary.getDtCreate());
-		if (dto.getDishUuid()!=null) {
-		diary.setDish(dishService.read(dto.getDishUuid()));}
-		if (dto.getProductUuid()!=null) {
-		diary.setProduct(productService.read(dto.getProductUuid()));}
+		if (dto.getDishUuid() != null) {
+			diary.setDish(dishService.read(dto.getDishUuid()));
+		}
+		if (dto.getProductUuid() != null) {
+			diary.setProduct(productService.read(dto.getProductUuid()));
+		}
 		diary.setWeight(dto.getWeight());
 		diary.setMealTime(dto.getMealTime());
-		auditService.create(new Audit(CREATED, ESSENCETYPE.DIARY, diary.getUuid().toString()),
-                user);
+		diary.setProfile(profileService.findByUser(user));
+		auditService.create(new Audit(CREATED, ESSENCETYPE.DIARY, diary.getUuid().toString()), user);
 		return diaryDao.create(diary);
 	}
-
-	
 
 	@Transactional
 	@Override
@@ -107,13 +109,12 @@ public class DiaryService implements IDiaryService {
 	public Diary update(UUID uuid, LocalDateTime dtUpdate, DiaryDTO dto) {
 		User user = userService.findByEmail(SecurityContextHolder.getContext().getAuthentication().getName());
 		Diary readed = diaryDao.findByUuid(uuid);
-		
 
 		if (readed == null) {
 			throw new IllegalArgumentException("Item not found");
 		}
 		if (!readed.getProfile().getUser().equals(user)) {
-			throw new IllegalArgumentException("You can only update the product you created");	
+			throw new IllegalArgumentException("You can only update the product you created");
 		}
 
 		if (!readed.getDtUpdate().isEqual(dtUpdate)) {
@@ -122,13 +123,14 @@ public class DiaryService implements IDiaryService {
 		validator.validate(dto);
 		readed.setDtUpdate(LocalDateTime.now());
 		readed.setWeight(dto.getWeight());
-		if (dto.getProductUuid()!=null) { 
-		readed.setProduct(productService.read(dto.getProductUuid()));}
-		if (dto.getDishUuid()!=null) {
-		readed.setDish(dishService.read(dto.getDishUuid()));}
+		if (dto.getProductUuid() != null) {
+			readed.setProduct(productService.read(dto.getProductUuid()));
+		}
+		if (dto.getDishUuid() != null) {
+			readed.setDish(dishService.read(dto.getDishUuid()));
+		}
 		readed.setMealTime(dto.getMealTime());
-		auditService.create(new Audit(UPDATED, ESSENCETYPE.DIARY, readed.getUuid().toString()),
-                user);
+		auditService.create(new Audit(UPDATED, ESSENCETYPE.DIARY, readed.getUuid().toString()), user);
 
 		return diaryDao.create(readed);
 	}
@@ -138,7 +140,7 @@ public class DiaryService implements IDiaryService {
 	public void delete(UUID uuid, LocalDateTime dtUpdate) {
 		User user = userService.findByEmail(SecurityContextHolder.getContext().getAuthentication().getName());
 		auditService.create(new Audit(DELETED, ESSENCETYPE.DIARY, diaryDao.findByUuid(uuid).getUuid().toString()),
-                user);
+				user);
 		diaryDao.delete(uuid, dtUpdate);
 
 	}

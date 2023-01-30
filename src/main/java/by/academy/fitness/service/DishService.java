@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import by.academy.fitness.dao.DishDao;
 import by.academy.fitness.dao.Filtering;
 import by.academy.fitness.dao.Sorting;
+import by.academy.fitness.domain.builders.UserMapper;
 import by.academy.fitness.domain.dto.DishDTO;
 import by.academy.fitness.domain.dto.IngredientDTO;
 import by.academy.fitness.domain.entity.Audit;
@@ -67,6 +68,7 @@ public class DishService implements IDishService {
 			ingr.add(x);
 		}
 		dish.setIngredients(ingr);
+		dish.setUser(UserMapper.userUI(user));
 		auditService.create(new Audit(CREATED, ESSENCETYPE.DISH, dish.getName() + " " + dish.getUuid().toString()),
 				user);
 
