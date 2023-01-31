@@ -9,12 +9,16 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import by.academy.fitness.domain.dto.PaginationContextDTO;
 import by.academy.fitness.domain.entity.Audit;
 import by.academy.fitness.domain.entity.Page;
+import by.academy.fitness.domain.entity.Audit;
 import by.academy.fitness.service.AuditService;
 
 @RestController
@@ -40,5 +44,10 @@ public class AuditController {
 		Page<Audit> report = auditService.get(pageable);
 
 		return new ResponseEntity<>(report, HttpStatus.OK);
+	}
+	@PostMapping(value = "/pagination")
+	protected ResponseEntity<Page<Audit>> getList(@RequestBody PaginationContextDTO paging) {
+		Page<Audit> page = auditService.get(paging.getAmount(), paging.getSkip(), paging.getSortings(), paging.getFilters());
+		return ResponseEntity.ok(page);
 	}
 }

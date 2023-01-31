@@ -93,7 +93,7 @@ public class ProfileService implements IProfileService {
 		readed.setType(dto.getType());
 		readed.setGender(dto.getGender());
 		readed.setUser(UserMapper.userUI(user));
-		auditService.create(new Audit(UPDATED, ESSENCETYPE.PROFILE, readed.getUuid().toString()), user);
+		auditService.create(new Audit(UPDATED, ESSENCETYPE.PROFILE, readed.getUuid().toString()), UserMapper.userUI(user));
 		return profileDao.create(readed);
 	}
 
@@ -113,7 +113,7 @@ public class ProfileService implements IProfileService {
 		if (!readed.getDtUpdate().isEqual(dtUpdate)) {
 			throw new IllegalArgumentException("Sorry, this item has already been edited");
 		}
-		auditService.create(new Audit(DELETED, ESSENCETYPE.PROFILE, readed.getUuid().toString()), user);
+		auditService.create(new Audit(DELETED, ESSENCETYPE.PROFILE, readed.getUuid().toString()), UserMapper.userUI(user));
 		profileDao.delete(uuid, dtUpdate);
 	}
 

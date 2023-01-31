@@ -57,7 +57,7 @@ public class ProductService implements IProductService {
 		product.setDtCreate(LocalDateTime.now().truncatedTo(ChronoUnit.MILLIS));
 		product.setDtUpdate(product.getDtCreate());
 		product.setUser(UserMapper.userUI(user));
-		auditService.create(new Audit(CREATED, ESSENCETYPE.PRODUCT, product.getName() + " " + product.getUuid()), user);
+		auditService.create(new Audit(CREATED, ESSENCETYPE.PRODUCT, product.getName() + " " + product.getUuid()), UserMapper.userUI(user));
 		return ProductMapper.productOutputMapping(productDao.create(product));
 	}
 
@@ -120,7 +120,7 @@ public class ProductService implements IProductService {
 		readed.setFats(dto.getFats());
 		readed.setCarbohydrates(dto.getCarbohydrates());
 		readed.setUser(UserMapper.userUI(user));
-		auditService.create(new Audit(UPDATED, ESSENCETYPE.PRODUCT, readed.getName()), user);
+		auditService.create(new Audit(UPDATED, ESSENCETYPE.PRODUCT, readed.getName()), UserMapper.userUI(user));
 		return productDao.create(readed);
 	}
 
@@ -139,7 +139,7 @@ public class ProductService implements IProductService {
 			throw new IllegalArgumentException("Sorry, this item has already been edited");
 		}
 
-		auditService.create(new Audit(DELETED, ESSENCETYPE.PRODUCT, uuid.toString()), user);
+		auditService.create(new Audit(DELETED, ESSENCETYPE.PRODUCT, uuid.toString()), UserMapper.userUI(user));
 		productDao.delete(uuid, dtUpdate);
 
 	}

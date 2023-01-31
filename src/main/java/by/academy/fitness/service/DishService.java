@@ -70,7 +70,7 @@ public class DishService implements IDishService {
 		dish.setIngredients(ingr);
 		dish.setUser(UserMapper.userUI(user));
 		auditService.create(new Audit(CREATED, ESSENCETYPE.DISH, dish.getName() + " " + dish.getUuid().toString()),
-				user);
+				UserMapper.userUI(user));
 
 		return dishDao.create(dish);
 	}
@@ -109,7 +109,7 @@ public class DishService implements IDishService {
 		}
 		readed.setIngredients(ingr);
 		auditService.create(new Audit(UPDATED, ESSENCETYPE.DISH, readed.getName() + " " + readed.getUuid().toString()),
-				user);
+				UserMapper.userUI(user));
 
 		return dishDao.create(readed);
 	}
@@ -121,7 +121,7 @@ public class DishService implements IDishService {
 		if (!dishDao.findByUuid(uuid).getUser().equals(user)) {
 			throw new IllegalArgumentException("You can only delete the product you created");
 		}
-		auditService.create(new Audit(DELETED, ESSENCETYPE.DISH, uuid.toString()), user);
+		auditService.create(new Audit(DELETED, ESSENCETYPE.DISH, uuid.toString()), UserMapper.userUI(user));
 		dishDao.delete(uuid, dtUpdate);
 
 	}

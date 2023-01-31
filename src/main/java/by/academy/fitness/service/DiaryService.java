@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 import by.academy.fitness.dao.DiaryDao;
 import by.academy.fitness.dao.Filtering;
 import by.academy.fitness.dao.Sorting;
+import by.academy.fitness.domain.builders.UserMapper;
 import by.academy.fitness.domain.dto.DiaryDTO;
 import by.academy.fitness.domain.entity.Audit;
 import by.academy.fitness.domain.entity.Audit.ESSENCETYPE;
@@ -68,7 +69,7 @@ public class DiaryService implements IDiaryService {
 		diary.setWeight(dto.getWeight());
 		diary.setMealTime(dto.getMealTime());
 		diary.setProfile(profileService.findByUser(user));
-		auditService.create(new Audit(CREATED, ESSENCETYPE.DIARY, diary.getUuid().toString()), user);
+		auditService.create(new Audit(CREATED, ESSENCETYPE.DIARY, diary.getUuid().toString()), UserMapper.userUI(user));
 		return diaryDao.create(diary);
 	}
 
@@ -130,7 +131,7 @@ public class DiaryService implements IDiaryService {
 			readed.setDish(dishService.read(dto.getDishUuid()));
 		}
 		readed.setMealTime(dto.getMealTime());
-		auditService.create(new Audit(UPDATED, ESSENCETYPE.DIARY, readed.getUuid().toString()), user);
+		auditService.create(new Audit(UPDATED, ESSENCETYPE.DIARY, readed.getUuid().toString()), UserMapper.userUI(user));
 
 		return diaryDao.create(readed);
 	}
@@ -140,7 +141,7 @@ public class DiaryService implements IDiaryService {
 	public void delete(UUID uuid, LocalDateTime dtUpdate) {
 		User user = userService.findByEmail(SecurityContextHolder.getContext().getAuthentication().getName());
 		auditService.create(new Audit(DELETED, ESSENCETYPE.DIARY, diaryDao.findByUuid(uuid).getUuid().toString()),
-				user);
+				UserMapper.userUI(user));
 		diaryDao.delete(uuid, dtUpdate);
 
 	}
