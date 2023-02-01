@@ -40,14 +40,13 @@ public class AuditController {
 
 	@GetMapping
 	public ResponseEntity<Page<Audit>> getList(@RequestParam int page, @RequestParam int size) {
-		Pageable pageable = PageRequest.of(page, size);
-		Page<Audit> report = auditService.get(pageable);
-
-		return new ResponseEntity<>(report, HttpStatus.OK);
+		return new ResponseEntity<>(auditService.get(size, page * size, null, null), HttpStatus.OK);
 	}
+
 	@PostMapping(value = "/pagination")
 	protected ResponseEntity<Page<Audit>> getList(@RequestBody PaginationContextDTO paging) {
-		Page<Audit> page = auditService.get(paging.getAmount(), paging.getSkip(), paging.getSortings(), paging.getFilters());
+		Page<Audit> page = auditService.get(paging.getAmount(), paging.getSkip(), paging.getSortings(),
+				paging.getFilters());
 		return ResponseEntity.ok(page);
 	}
 }

@@ -1,5 +1,6 @@
 package by.academy.fitness.domain.builders;
 
+import by.academy.fitness.domain.dto.UserDTO;
 import by.academy.fitness.domain.dto.UserRegistrationDTO;
 import by.academy.fitness.domain.entity.User;
 
@@ -10,5 +11,8 @@ public class UserMapper {
 
 	public static User userUI(User user) {
 		return new User(user.getUuid(), user.getDtCreate(), user.getDtUpdate());
+	}
+	public static UserDTO dto(User user) {
+		return new UserDTO(user.getEmail(), user.getUsername(), user.getRoles(), user.getStatus(), user.getPassword());
 	}
 }

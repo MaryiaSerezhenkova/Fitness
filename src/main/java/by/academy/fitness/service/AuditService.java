@@ -5,14 +5,11 @@ import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.UUID;
 
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import by.academy.fitness.dao.AuditDao;
 import by.academy.fitness.dao.Filtering;
 import by.academy.fitness.dao.Sorting;
-import by.academy.fitness.domain.builders.AuditMapper;
-import by.academy.fitness.domain.builders.UserMapper;
 import by.academy.fitness.domain.entity.Audit;
 import by.academy.fitness.domain.entity.Page;
 import by.academy.fitness.domain.entity.User;
@@ -32,17 +29,11 @@ public class AuditService implements IAuditService {
 		Audit audit = new Audit();
 		audit.setUuid(UUID.randomUUID());
 		audit.setDtCreate(LocalDateTime.now().truncatedTo(ChronoUnit.MILLIS));
-		audit.setUser(UserMapper.userUI(user));
+		audit.setUser(user);
 		audit.setType(type.getType());
 		audit.setText(type.getText());
 		audit.setId(type.getId());
 		return auditDao.create(audit);
-	}
-
-	@Override
-	public Page<Audit> get(Pageable pageable) {
-		Page<Audit> items = (Page<Audit>) auditDao.getPage(pageable);
-		return AuditMapper.pageMapper(items);
 	}
 
 	@Override

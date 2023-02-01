@@ -15,6 +15,8 @@ import by.academy.fitness.dao.Sorting;
 import by.academy.fitness.dao.UserDao;
 import by.academy.fitness.domain.builders.UserMapper;
 import by.academy.fitness.domain.dto.UserRegistrationDTO;
+import by.academy.fitness.domain.entity.Audit;
+import by.academy.fitness.domain.entity.Audit.ESSENCETYPE;
 import by.academy.fitness.domain.entity.Page;
 import by.academy.fitness.domain.entity.Role;
 import by.academy.fitness.domain.entity.User;
@@ -25,19 +27,22 @@ import by.academy.fitness.service.interf.IUserService;
 
 @Service
 public class UserService implements IUserService {
+    private final static String WAITING_ACTIVATION = "User sent request for activation";
+    private final static String UPDATED = "User updated";
 
 	private final UserDao userDao;
 	private final RoleService roleService;
 	private final RegistrationValidator validator;
 	private final PasswordEncoder encoder;
+	private final AuditService auditService;
 
 	@Autowired
-	public UserService(UserDao userDao, RoleService roleService, RegistrationValidator validator, PasswordEncoder encoder) {
-		super();
+	public UserService(UserDao userDao, RoleService roleService, RegistrationValidator validator, PasswordEncoder encoder, AuditService auditService) {
 		this.userDao = userDao;
 		this.roleService = roleService;
 		this.validator = validator;
 		this.encoder=encoder;
+		this.auditService=auditService;
 	}
 
 	@Transactional
@@ -52,6 +57,7 @@ public class UserService implements IUserService {
 		user.setRoles(Set.of(role));
 		user.setStatus(USERSTATUS.WAITING_ACTIVATION);
 		user.setPassword(encoder.encode(dto.getPassword()));
+		auditService.create(new Audit(WAITING_ACTIVATION, ESSENCETYPE.USER, user.getUsername()), user);
 		return userDao.create(user);
 	}
 
@@ -109,6 +115,7 @@ public class UserService implements IUserService {
 		readed.setEmail(dto.getEmail());
 		readed.setUsername(dto.getUsername());
 		readed.setPassword(dto.getPassword());
+		auditService.create(new Audit(UPDATED, ESSENCETYPE.USER, readed.getUsername()), readed);
 		return userDao.update(uuid, dtUpdate, readed);
 	}
 

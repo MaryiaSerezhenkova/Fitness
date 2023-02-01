@@ -1,4 +1,5 @@
 package by.academy.fitness.security;
+
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
@@ -38,14 +39,9 @@ public class UserDetailsImpl implements UserDetails {
 
 	public static UserDetailsImpl build(User user) {
 		List<GrantedAuthority> authorities = user.getRoles().stream()
-				.map(role -> new SimpleGrantedAuthority(role.getName().name()))
-				.collect(Collectors.toList());
+				.map(role -> new SimpleGrantedAuthority("ROLE_" + role.getName().name())).collect(Collectors.toList());
 
-		return new UserDetailsImpl(
-				user.getUuid(), 
-				user.getUsername(), 
-				user.getEmail(),
-				user.getPassword(), 
+		return new UserDetailsImpl(user.getUuid(), user.getUsername(), user.getEmail(), user.getPassword(),
 				authorities);
 	}
 

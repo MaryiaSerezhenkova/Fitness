@@ -79,9 +79,9 @@ public class WebSecurityConfig {
 				.antMatchers("/api/v1/users/signin").permitAll()
 				.antMatchers("/api/v1/users/signup").permitAll()
 				.antMatchers("/api/v1/users/verify/**").permitAll()
-				.antMatchers("/api/v1/users/me").hasAnyRole(ROLE.ADMIN.name().substring(5), ROLE.USER.name().substring(4))
-				.antMatchers("/api/v1/users/**").hasRole(ROLE.ADMIN.name().substring(5))
-				.antMatchers("/api/v1/audit/**").permitAll()
+				.antMatchers("/api/v1/users/me").hasAnyRole(ROLE.ADMIN.name(), ROLE.USER.name())
+				.antMatchers("/api/v1/users/**").hasRole(ROLE.ADMIN.name())
+				.antMatchers("/api/v1/audit/**").hasRole(ROLE.ADMIN.name())
 				//.hasRole(ROLE.ADMIN.name().substring(5))
 				.anyRequest().authenticated();
 

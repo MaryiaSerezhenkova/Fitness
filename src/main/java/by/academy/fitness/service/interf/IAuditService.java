@@ -15,8 +15,6 @@ public interface IAuditService {
 	
 	Audit create(Audit audit, User user);
 
-	Page<Audit> get(Pageable pageable);
-
 	Audit read(UUID uuid);
 	
 	Page<Audit> get(Integer amount, Integer skip, List<Sorting> sortings, List<Filtering> filters);

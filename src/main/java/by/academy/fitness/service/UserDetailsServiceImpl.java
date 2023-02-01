@@ -21,13 +21,13 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 	private static final Logger logger = LoggerFactory.getLogger(UserDetailsServiceImpl.class);
 	@Override
 	@Transactional
-	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+	public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
 		User user = new User();
 		try {
 			//user = userDao.findByUsername(username);
-			user = userDao.findByEmail(username);
+			user = userDao.findByEmail(email);
 		} catch (UsernameNotFoundException e) {
-			logger.error("User Not Found with username: " + username);
+			logger.error("User Not Found with username: " + email);
 		}
 
 		return UserDetailsImpl.build(user);

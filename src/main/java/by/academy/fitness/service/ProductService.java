@@ -56,7 +56,7 @@ public class ProductService implements IProductService {
 		product.setUuid(UUID.randomUUID());
 		product.setDtCreate(LocalDateTime.now().truncatedTo(ChronoUnit.MILLIS));
 		product.setDtUpdate(product.getDtCreate());
-		product.setUser(UserMapper.userUI(user));
+		product.setUser(user);
 		auditService.create(new Audit(CREATED, ESSENCETYPE.PRODUCT, product.getName() + " " + product.getUuid()), UserMapper.userUI(user));
 		return ProductMapper.productOutputMapping(productDao.create(product));
 	}
