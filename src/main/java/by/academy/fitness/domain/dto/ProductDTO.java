@@ -1,13 +1,18 @@
 package by.academy.fitness.domain.dto;
 
 
+import java.util.UUID;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonProperty.Access;
+
 import by.academy.fitness.domain.entity.Product.UNIT;
 
 
 
 public class ProductDTO  {
-
-
+	@JsonProperty(access=Access.READ_ONLY)
+	private UUID id;
 	private String name;
 	private int weight;
 	private UNIT unit;
@@ -15,6 +20,9 @@ public class ProductDTO  {
 	private double  proteins;
 	private double  fats;
 	private double  carbohydrates;
+	@JsonProperty(access=Access.READ_ONLY)
+	private UserShortViewDTO user;
+	
 	
 	public ProductDTO() {
 		super();

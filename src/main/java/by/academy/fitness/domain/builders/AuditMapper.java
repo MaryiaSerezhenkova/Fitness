@@ -30,5 +30,9 @@ public class AuditMapper {
 
 		return dto;
 	}
+	public static Audit auditUI (Audit audit) {
+		return new Audit (audit.getUuid(), audit.getDtCreate(), UserMapper.userUI(audit.getUser()),  audit.getText(), audit.getType(), audit.getId());
+		
+	}
 
 }

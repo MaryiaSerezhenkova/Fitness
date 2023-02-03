@@ -15,4 +15,10 @@ public class UserMapper {
 	public static UserDTO dto(User user) {
 		return new UserDTO(user.getEmail(), user.getUsername(), user.getRoles(), user.getStatus(), user.getPassword());
 	}
+	public static User user(UserDTO dto) {
+		return new User(dto.getEmail(), dto.getUsername(), dto.getRoles(), dto.getStatus(), dto.getPassword());
+	}
+	public static User userUUID(User user) {
+		return new User(user.getUuid());
+	}
 }

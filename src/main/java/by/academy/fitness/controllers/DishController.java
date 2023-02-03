@@ -14,10 +14,12 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import by.academy.fitness.domain.dto.DishDTO;
 import by.academy.fitness.domain.dto.PaginationContextDTO;
+import by.academy.fitness.domain.entity.Audit;
 import by.academy.fitness.domain.entity.Dish;
 import by.academy.fitness.domain.entity.Page;
 import by.academy.fitness.service.DishService;
@@ -39,7 +41,10 @@ public class DishController {
 		return ResponseEntity.ok(dishService.read(uuid));
 	}
 
-	
+	@GetMapping
+	public ResponseEntity<Page<Dish>> getList(@RequestParam int page, @RequestParam int size) {
+		return new ResponseEntity<>(dishService.get(size, page * size, null, null), HttpStatus.OK);
+	}
 
 	@PostMapping(value = "/pagination")
 	protected ResponseEntity<Page<Dish>> getList(@RequestBody PaginationContextDTO paging) {

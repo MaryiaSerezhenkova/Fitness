@@ -82,7 +82,6 @@ public class WebSecurityConfig {
 				.antMatchers("/api/v1/users/me").hasAnyRole(ROLE.ADMIN.name(), ROLE.USER.name())
 				.antMatchers("/api/v1/users/**").hasRole(ROLE.ADMIN.name())
 				.antMatchers("/api/v1/audit/**").hasRole(ROLE.ADMIN.name())
-				//.hasRole(ROLE.ADMIN.name().substring(5))
 				.anyRequest().authenticated();
 
 		http.authenticationProvider(authenticationProvider());

@@ -15,4 +15,9 @@ public class ProductMapper {
 		return new Product(product.getUuid(), product.getDtCreate(), product.getDtUpdate(), product.getName(),
 				product.getWeight(), product.getUnit(), product.getColories(), product.getProteins(), product.getFats(), product.getCarbohydrates(), product.getUser());
 	}
+	public static Product productUI(Product product) {
+		return new Product(product.getUuid(), product.getDtCreate(), product.getDtUpdate(), product.getName(),
+				product.getWeight(), product.getUnit(), product.getColories(), product.getProteins(), product.getFats(), product.getCarbohydrates(), UserMapper.userUUID(product.getUser()));
+	}
+	
 }

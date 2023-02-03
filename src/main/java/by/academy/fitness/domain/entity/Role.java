@@ -14,6 +14,8 @@ import by.academy.fitness.domain.entity.User.ROLE;
 @Entity
 @Table(name = "roles")
 public class Role implements IEntity {
+	private static final long serialVersionUID = 1L;
+
 	@Id
 	private UUID uuid;
 

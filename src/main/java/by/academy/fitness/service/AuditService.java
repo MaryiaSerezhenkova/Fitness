@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import by.academy.fitness.dao.AuditDao;
 import by.academy.fitness.dao.Filtering;
 import by.academy.fitness.dao.Sorting;
+import by.academy.fitness.domain.builders.AuditMapper;
 import by.academy.fitness.domain.entity.Audit;
 import by.academy.fitness.domain.entity.Page;
 import by.academy.fitness.domain.entity.User;
@@ -38,13 +39,19 @@ public class AuditService implements IAuditService {
 
 	@Override
 	public Audit read(UUID uuid) {
-		return auditDao.findByUuid(uuid);
+		return AuditMapper.auditUI(auditDao.findByUuid(uuid));
 	}
 
 	@Override
 	public Page<Audit> get(Integer amount, Integer skip, List<Sorting> sortings, List<Filtering> filters) {
 		Page<Audit> page = new Page<>();
-		page.setContent(auditDao.findAll(amount, skip, sortings, filters));
+		List<Audit> list = auditDao.findAll(amount, skip, sortings, filters);
+		for (Audit l: list) {
+			l = AuditMapper.auditUI(l);
+		}
+		
+		//page.setContent(auditDao.findAll(amount, skip, sortings, filters));
+		page.setContent(list);
 		page.setPageSize(amount);
 		int count = auditDao.count(filters);
 		page.setTotalElements(count);

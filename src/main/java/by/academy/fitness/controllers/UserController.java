@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import by.academy.fitness.domain.builders.UserMapper;
@@ -42,11 +43,6 @@ public class UserController {
 		return ResponseEntity.ok(userService.read(uuid));
 	}
 
-	@PostMapping
-	public ResponseEntity<User> doPost(@RequestBody UserRegistrationDTO data) {
-		User created = this.userService.create(data);
-		return new ResponseEntity<>(created, HttpStatus.CREATED);
-	}
 
 	@GetMapping("/me")
 	public ResponseEntity<UserDTO> me() {
@@ -75,5 +71,9 @@ public class UserController {
 		Page<User> page = userService.get(paging.getAmount(), paging.getSkip(), paging.getSortings(),
 				paging.getFilters());
 		return ResponseEntity.ok(page);
+	}
+	@GetMapping
+	public ResponseEntity<Page<User>> getList(@RequestParam int page, @RequestParam int size) {
+		return new ResponseEntity<>(userService.get(size, page * size, null, null), HttpStatus.OK);
 	}
 }

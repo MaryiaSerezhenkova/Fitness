@@ -21,7 +21,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import by.academy.fitness.domain.dto.PaginationContextDTO;
 import by.academy.fitness.domain.dto.ProductDTO;
-import by.academy.fitness.domain.entity.Product;
 import by.academy.fitness.domain.entity.Page;
 import by.academy.fitness.domain.entity.Product;
 import by.academy.fitness.service.ProductService;
@@ -41,7 +40,10 @@ public class ProductController {
 	protected ResponseEntity<Product> get(@PathVariable UUID uuid) {
 		return ResponseEntity.ok(productService.read(uuid));
 	}
-
+	@GetMapping
+	public ResponseEntity<Page<Product>> getList(@RequestParam int page, @RequestParam int size) {
+		return new ResponseEntity<>(productService.get(size, page * size, null, null), HttpStatus.OK);
+	}
 
 	@PostMapping(value = "/pagination")
 	protected ResponseEntity<Page<Product>> getList(@RequestBody PaginationContextDTO paging) {
@@ -61,13 +63,6 @@ public class ProductController {
 		LocalDateTime dtUpdate = LocalDateTime.ofInstant(Instant.ofEpochMilli(dtUpdateRow), ZoneId.systemDefault());
 		System.out.println(dtUpdate);
 		return ResponseEntity.ok(this.productService.update(uuid, dtUpdate, data));
-	}
-	@GetMapping
-	public ResponseEntity<Page<Product>> getList(@RequestParam int page, @RequestParam int size) {
-		Pageable pageable = PageRequest.of(page, size);
-		Page<Product> report = productService.get(pageable);
-
-		return new ResponseEntity<>(report, HttpStatus.OK);
 	}
 
 }

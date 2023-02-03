@@ -1,8 +1,5 @@
 package by.academy.fitness.controllers;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -17,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import by.academy.fitness.domain.dto.LoginDTO;
+import by.academy.fitness.domain.dto.UserDTO;
 import by.academy.fitness.domain.dto.UserRegistrationDTO;
 import by.academy.fitness.security.UserDetailsImpl;
 import by.academy.fitness.security.jwt.JwtUtils;
@@ -68,6 +66,24 @@ public class AuthController {
 				new JwtResponse(jwt, userDetails.getUuid(),userDetails.getEmail()));
 	}
 
+//	@PostMapping("/signup")
+//	public ResponseEntity<?> registerUser(@RequestBody UserRegistrationDTO data) {
+//		if (userService.existsByUsername(data.getUsername())) {
+//			return ResponseEntity.badRequest().body(new MessageResponse("Error: Username is already taken!"));
+//		}
+//
+//		if (userService.existsByEmail(data.getEmail())) {
+//			return ResponseEntity.badRequest().body(new MessageResponse("Error: Email is already taken!"));
+//		}
+//
+//		// Create new user's account
+//
+//		// userService.create(data);
+//
+//		verificationService.waitingActivation(data);
+//		return ResponseEntity
+//				.ok(new MessageResponse("User registered successfully!Please check your email for verification link."));
+//	}
 	@PostMapping("/signup")
 	public ResponseEntity<?> registerUser(@RequestBody UserRegistrationDTO data) {
 		if (userService.existsByUsername(data.getUsername())) {
@@ -78,16 +94,19 @@ public class AuthController {
 			return ResponseEntity.badRequest().body(new MessageResponse("Error: Email is already taken!"));
 		}
 
-		// Create new user's account
+//		// Create new user's account
 
 		// userService.create(data);
 
-		verificationService.waitingActivation(data);
-		// VerificationToken verificationToken =
-		// authenticationManager.authenticate(data);
-
+		verificationService.registration(data);
 		return ResponseEntity
-				.ok(new MessageResponse("User registered successfully!Please check your email for verification link."));
+				.ok(new MessageResponse("You registered successfully! Please check your email for verification link."));
+	}
+	@PostMapping
+	public ResponseEntity<?> addUser(@RequestBody UserDTO data) {
+		verificationService.waitingActivation(data);
+		return ResponseEntity
+				.ok(new MessageResponse("User saved to database. Token sent to email"));
 	}
 
 	@GetMapping("/verify/{token}")

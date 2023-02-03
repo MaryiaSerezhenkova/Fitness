@@ -14,7 +14,6 @@ import org.springframework.transaction.annotation.Transactional;
 import by.academy.fitness.dao.Filtering;
 import by.academy.fitness.dao.ProductDao;
 import by.academy.fitness.dao.Sorting;
-import by.academy.fitness.domain.builders.ProductMapper;
 import by.academy.fitness.domain.builders.UserMapper;
 import by.academy.fitness.domain.dto.ProductDTO;
 import by.academy.fitness.domain.entity.Audit;
@@ -22,6 +21,8 @@ import by.academy.fitness.domain.entity.Audit.ESSENCETYPE;
 import by.academy.fitness.domain.entity.Page;
 import by.academy.fitness.domain.entity.Product;
 import by.academy.fitness.domain.entity.User;
+import by.academy.fitness.domain.mapper.impl.BaseMapper;
+import by.academy.fitness.domain.mapper.impl.ProductMapper;
 import by.academy.fitness.domain.validators.ProductValidator;
 import by.academy.fitness.service.interf.IProductService;
 
@@ -36,15 +37,17 @@ public class ProductService implements IProductService {
 	private final ProductValidator validator;
 	private final UserService userService;
 	private final AuditService auditService;
+	private final BaseMapper<Product, ProductDTO> mapper;
 
 	@Autowired
 	public ProductService(ProductDao productDao, ProductValidator validator, UserService userService,
-			AuditService auditService) {
+			AuditService auditService,ProductMapper mapper) {
 		super();
 		this.productDao = productDao;
 		this.validator = validator;
 		this.userService = userService;
 		this.auditService = auditService;
+		this.mapper= mapper;
 	}
 
 	@Transactional
@@ -52,19 +55,19 @@ public class ProductService implements IProductService {
 	public Product create(ProductDTO dto) {
 		User user = userService.findByEmail(SecurityContextHolder.getContext().getAuthentication().getName());
 		validator.validate(dto);
-		Product product = ProductMapper.productInputMapping(dto);
+		Product product =mapper.toEntity(dto);
 		product.setUuid(UUID.randomUUID());
 		product.setDtCreate(LocalDateTime.now().truncatedTo(ChronoUnit.MILLIS));
 		product.setDtUpdate(product.getDtCreate());
 		product.setUser(user);
 		auditService.create(new Audit(CREATED, ESSENCETYPE.PRODUCT, product.getName() + " " + product.getUuid()), UserMapper.userUI(user));
-		return ProductMapper.productOutputMapping(productDao.create(product));
+		return productDao.create(product);
 	}
 
 	@Transactional
 	@Override
-	public Product read(UUID uuid) {
-		return productDao.findByUuid(uuid);
+	public ProductDTO read(UUID uuid) {
+		return mapper.toDTO(productDao.findByUuid(uuid));
 	}
 
 	@Transactional

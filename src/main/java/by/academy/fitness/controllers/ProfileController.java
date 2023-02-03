@@ -14,8 +14,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import by.academy.fitness.domain.dto.ProfileDTO;
+import by.academy.fitness.domain.entity.Audit;
+import by.academy.fitness.domain.entity.Page;
 import by.academy.fitness.domain.entity.Profile;
 import by.academy.fitness.service.ProfileService;
 
@@ -40,6 +43,10 @@ public class ProfileController {
 	public ResponseEntity<Profile> doPost(@RequestBody ProfileDTO data) {
 		Profile created = this.profileService.create(data);
 		return new ResponseEntity<>(created, HttpStatus.CREATED);
+	}
+	@GetMapping
+	public ResponseEntity<Page<Profile>> getList(@RequestParam int page, @RequestParam int size) {
+		return new ResponseEntity<>(profileService.get(size, page * size, null, null), HttpStatus.OK);
 	}
 
 	@PutMapping(value = "/{uuid}/dtUpdate/{dt_update}")

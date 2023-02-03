@@ -7,6 +7,7 @@ import java.util.UUID;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
@@ -42,7 +43,7 @@ public class Dish implements IEntity {
 	@OneToMany (cascade=CascadeType.ALL, orphanRemoval = true)
 	@JoinColumn(name = "dish_uuid", referencedColumnName = "uuid")
 	private List<Ingredient> ingredients;
-	@ManyToOne
+	@ManyToOne(fetch=FetchType.LAZY)
     @JoinColumn(name = "user_uuid", referencedColumnName = "uuid")
     private User user;
 

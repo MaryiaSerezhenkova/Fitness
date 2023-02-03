@@ -64,7 +64,7 @@ public class UserService implements IUserService {
 	@Transactional
 	@Override
 	public User read(UUID uuid) {
-		return userDao.findByUuid(uuid);
+		return  userDao.findByUuid(uuid);
 	}
 
 	@Transactional
@@ -104,9 +104,6 @@ public class UserService implements IUserService {
 		if (readed == null) {
 			throw new IllegalArgumentException("Item not found");
 		}
-//		if (!readed.getUser().equals(user)) {
-//			throw new IllegalArgumentException("You can only update the product you created");	
-//		}
 
 		if (!readed.getDtUpdate().isEqual(dtUpdate)) {
 			throw new IllegalArgumentException("Sorry, this item has already been edited");
@@ -116,7 +113,7 @@ public class UserService implements IUserService {
 		readed.setUsername(dto.getUsername());
 		readed.setPassword(dto.getPassword());
 		auditService.create(new Audit(UPDATED, ESSENCETYPE.USER, readed.getUsername()), readed);
-		return userDao.update(uuid, dtUpdate, readed);
+		return userDao.create(readed);
 	}
 
 	@Transactional
@@ -136,15 +133,15 @@ public class UserService implements IUserService {
 
 	@Transactional
 	@Override
-	public User updateRole(UUID uuid, ROLE role, LocalDateTime dtUpdate) {
+	public User updateRole(UUID uuid, Set<Role> role, LocalDateTime dtUpdate) {
 		User readed = userDao.findByUuid(uuid);
 		if (readed == null) {
 			throw new IllegalArgumentException("Not found");
 		}
-		// if (!readed.getDtUpdate().isEqual(dtUpdate)) {
-//			throw new IllegalArgumentException("Version is outdated");
-//		}
-		// readed.setRoles(role);
+		 if (!readed.getDtUpdate().isEqual(dtUpdate)) {
+			throw new IllegalArgumentException("Version is outdated");
+		}
+		 readed.setRoles(role);
 		return userDao.update(uuid, dtUpdate, readed);
 
 	}
@@ -156,11 +153,11 @@ public class UserService implements IUserService {
 		if (readed == null) {
 			throw new IllegalArgumentException("Not found");
 		}
-		// if (!readed.getDtUpdate().isEqual(dtUpdate)) {
-//			throw new IllegalArgumentException("Version is outdated");
-//		}
+		 if (!readed.getDtUpdate().isEqual(dtUpdate)) {
+			throw new IllegalArgumentException("Version is outdated");
+		}
 		readed.setStatus(status);
-		return userDao.update(uuid, dtUpdate, readed);
+		return userDao.create(readed);
 	}
 
 	@Transactional
@@ -180,6 +177,12 @@ public class UserService implements IUserService {
 	@Transactional
 	public User findByUsername(String username) {
 		return userDao.findByUsername(username);
+	}
+
+	@Override
+	public User updateRole(UUID uuid, ROLE role, LocalDateTime dtUpdate) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

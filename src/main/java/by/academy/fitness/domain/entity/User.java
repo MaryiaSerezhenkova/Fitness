@@ -18,6 +18,8 @@ import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 import javax.persistence.Version;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonProperty.Access;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
@@ -73,6 +75,7 @@ public class User implements IEntity {
 	private USERSTATUS status;
 
 	@Column(length = 120)
+	@JsonProperty(access=Access.WRITE_ONLY)
 	private String password;
 
 	public User() {
@@ -97,12 +100,23 @@ public class User implements IEntity {
 		this.username = username;
 		this.password = password;
 	}
+	public User(UUID uuid) {
+		this.uuid = uuid;
+	}
 
 	public User(UUID uuid, LocalDateTime dtCreate, LocalDateTime dtUpdate) {
 		super();
 		this.uuid = uuid;
 		this.dtCreate = dtCreate;
 		this.dtUpdate = dtUpdate;
+	}
+
+	public User(String email, String username, Set<Role> roles, USERSTATUS status, String password) {
+		this.email = email;
+		this.username = username;
+		this.roles = roles;
+		this.status = status;
+		this.password = password;
 	}
 
 	public UUID getUuid() {

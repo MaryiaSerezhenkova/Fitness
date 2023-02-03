@@ -1,7 +1,5 @@
 package by.academy.fitness.service;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -11,12 +9,14 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.util.UriUtils;
 
 import by.academy.fitness.dao.VerificationDao;
+import by.academy.fitness.domain.dto.UserDTO;
 import by.academy.fitness.domain.dto.UserRegistrationDTO;
 import by.academy.fitness.domain.entity.Audit;
 import by.academy.fitness.domain.entity.Audit.ESSENCETYPE;
 import by.academy.fitness.domain.entity.User;
 import by.academy.fitness.domain.entity.User.USERSTATUS;
 import by.academy.fitness.domain.entity.VerificationToken;
+import by.academy.fitness.domain.validators.SaveUserValidaror;
 import by.academy.fitness.exceptions.ValidationException;
 import by.academy.fitness.security.filters.CryptoUtil;
 import by.academy.fitness.service.interf.IUserService;
@@ -25,20 +25,23 @@ import by.academy.fitness.service.interf.IVerificationService;
 @Service
 public class VerificationService implements IVerificationService {
 
-	private final static String ACTIVATED = "User confirm email";
+	private final static String ACTIVATED = "User saved in database. Token sent to email";
+	private final static String CONFIRM = "User confirm email";
 
 	private final IUserService userService;
 	private final EmailServiceImpl mailServiceImpl;
 	private final VerificationDao verificationDao;
 	private final AuditService auditService;
+	private final SaveUserValidaror validator;
 
 	@Autowired
 	public VerificationService(IUserService userService, EmailServiceImpl mailServiceImpl,
-			VerificationDao verificationDao, AuditService auditService) {
+			VerificationDao verificationDao, AuditService auditService, SaveUserValidaror validator) {
 		this.userService = userService;
 		this.mailServiceImpl = mailServiceImpl;
 		this.verificationDao = verificationDao;
 		this.auditService = auditService;
+		this.validator = validator;
 	}
 
 	@Override
@@ -47,24 +50,24 @@ public class VerificationService implements IVerificationService {
 		this.mailServiceImpl.sendSimpleMessage(email, "Activation code", message);
 	}
 
+//	@Transactional
+//	@Override
+//	public User waitingActivation(UserRegistrationDTO dto) {
+//		User user = this.userService.create(dto);
+//		VerificationToken token = new VerificationToken();
+//		token.setDtCreate(LocalDateTime.now());
+//		token.setUuid(UUID.randomUUID());
+//		String encodedToken = CryptoUtil.encrypt("VerificationToken",
+//				token.getUuid().toString() + "|" + user.getEmail());
+//		token.setUser(user);
+//		token.setToken(UriUtils.encode(encodedToken, "UTF-8"));
+//
+//		verificationDao.create(token);
+//		sendMessage(user.getEmail(), token.getToken());
+//
+//		return user;
+//	}
 	@Transactional
-	@Override
-	public User waitingActivation(UserRegistrationDTO dto) {
-		User user = this.userService.create(dto);
-		VerificationToken token = new VerificationToken();
-		token.setDtCreate(LocalDateTime.now());
-		token.setUuid(UUID.randomUUID());
-		String encodedToken = CryptoUtil.encrypt("VerificationToken",
-				token.getUuid().toString() + "|" + user.getEmail());
-		token.setUser(user);
-		token.setToken(UriUtils.encode(encodedToken, "UTF-8"));
-
-		verificationDao.create(token);
-		sendMessage(user.getEmail(), token.getToken());
-
-		return user;
-	}
-
 	@Override
 	public boolean verify(String token) {
 		String info = null;
@@ -83,11 +86,37 @@ public class VerificationService implements IVerificationService {
 		}
 		if (t.getUser().equals(user)) {
 			user.setStatus(USERSTATUS.ACTIVATED);
+			userService.updateStatus(user.getUuid(), user.getStatus(), user.getDtUpdate());
 			return true;
 
 		}
-		auditService.create(new Audit(ACTIVATED, ESSENCETYPE.USER, user.getUsername()), user);
+		auditService.create(new Audit(CONFIRM, ESSENCETYPE.USER, user.getUsername()), user);
 		return false;
+	}
+
+	@Transactional
+	@Override
+	public User registration(UserRegistrationDTO dto) {
+		return userService.create(dto);
+	}
+
+	@Transactional
+	@Override
+	public User waitingActivation(UserDTO dto) {
+		validator.validate(dto);
+		User user = userService.findByEmail(dto.getEmail());
+		VerificationToken token = new VerificationToken();
+		token.setDtCreate(LocalDateTime.now());
+		token.setUuid(UUID.randomUUID());
+		String encodedToken = CryptoUtil.encrypt("VerificationToken",
+				token.getUuid().toString() + "|" + dto.getEmail());
+		token.setUser(user);
+		token.setToken(UriUtils.encode(encodedToken, "UTF-8"));
+		verificationDao.create(token);
+		sendMessage(dto.getEmail(), token.getToken());
+		auditService.create(new Audit(ACTIVATED, ESSENCETYPE.USER, user.getUsername()), user);
+
+		return userService.findByEmail(dto.getEmail());
 	}
 
 }
