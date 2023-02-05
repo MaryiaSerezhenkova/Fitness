@@ -6,8 +6,6 @@ import java.time.ZoneId;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -38,31 +36,31 @@ public class ProductController {
 
 	@GetMapping(value = "/{uuid}")
 	protected ResponseEntity<Product> get(@PathVariable UUID uuid) {
-		return ResponseEntity.ok(productService.read(uuid));
+		//return ResponseEntity.ok(productService.read(uuid));
+		return ResponseEntity.ok(productService.readAll(uuid));
 	}
+
 	@GetMapping
-	public ResponseEntity<Page<Product>> getList(@RequestParam int page, @RequestParam int size) {
+	public ResponseEntity<Page<ProductDTO>> getList(@RequestParam int page, @RequestParam int size) {
 		return new ResponseEntity<>(productService.get(size, page * size, null, null), HttpStatus.OK);
 	}
 
 	@PostMapping(value = "/pagination")
-	protected ResponseEntity<Page<Product>> getList(@RequestBody PaginationContextDTO paging) {
-		Page<Product> page = productService.get(paging.getAmount(), paging.getSkip(), paging.getSortings(), paging.getFilters());
-		return ResponseEntity.ok(page);
+	protected ResponseEntity<Page<ProductDTO>> getList(@RequestBody PaginationContextDTO paging) {
+		return ResponseEntity.ok(
+				productService.get(paging.getAmount(), paging.getSkip(), paging.getSortings(), paging.getFilters()));
 	}
 
 	@PostMapping
-	public ResponseEntity<Product> doPost(@RequestBody ProductDTO data) {
-		Product created = this.productService.create(data);
-		return new ResponseEntity<>(created, HttpStatus.CREATED);
+	public ResponseEntity<ProductDTO> doPost(@RequestBody ProductDTO data) {
+		return new ResponseEntity<>(productService.create(data), HttpStatus.CREATED);
 	}
 
 	@PutMapping(value = "/{uuid}/dtUpdate/{dt_update}")
-	protected ResponseEntity<Product> doPut(@PathVariable UUID uuid, @PathVariable("dt_update") long dtUpdateRow,
+	protected ResponseEntity<ProductDTO> doPut(@PathVariable UUID uuid, @PathVariable("dt_update") long dtUpdateRow,
 			@RequestBody ProductDTO data) {
-		LocalDateTime dtUpdate = LocalDateTime.ofInstant(Instant.ofEpochMilli(dtUpdateRow), ZoneId.systemDefault());
-		System.out.println(dtUpdate);
-		return ResponseEntity.ok(this.productService.update(uuid, dtUpdate, data));
+		return ResponseEntity.ok(productService.update(uuid,
+				LocalDateTime.ofInstant(Instant.ofEpochMilli(dtUpdateRow), ZoneId.systemDefault()), data));
 	}
 
 }

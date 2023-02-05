@@ -9,9 +9,14 @@ import by.academy.fitness.dao.Sorting;
 import by.academy.fitness.domain.entity.Page;
 
 public interface IService<TYPE, DTO> {
-    TYPE create(DTO dto);
-    TYPE read(UUID uuid);
-    Page<TYPE> get(Integer amount, Integer skip, List<Sorting> sortings, List<Filtering> filters);
-    TYPE update(UUID uuid, LocalDateTime dtUpdate, DTO dto);
-    void delete(UUID uuid, LocalDateTime dtUpdate);
+
+	DTO create(DTO dto);
+
+	DTO read(UUID uuid);
+
+	Page<DTO> get(Integer amount, Integer skip, List<Sorting> sortings, List<Filtering> filters);
+
+	DTO update(UUID uuid, LocalDateTime dtUpdate, DTO dto);
+
+	void delete(UUID uuid, LocalDateTime dtUpdate);
 }

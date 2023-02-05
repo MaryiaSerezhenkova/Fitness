@@ -4,9 +4,9 @@ import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,8 +14,8 @@ import org.springframework.transaction.annotation.Transactional;
 import by.academy.fitness.dao.Filtering;
 import by.academy.fitness.dao.ProductDao;
 import by.academy.fitness.dao.Sorting;
-import by.academy.fitness.domain.builders.UserMapper;
 import by.academy.fitness.domain.dto.ProductDTO;
+import by.academy.fitness.domain.dto.UserDTO;
 import by.academy.fitness.domain.entity.Audit;
 import by.academy.fitness.domain.entity.Audit.ESSENCETYPE;
 import by.academy.fitness.domain.entity.Page;
@@ -23,6 +23,7 @@ import by.academy.fitness.domain.entity.Product;
 import by.academy.fitness.domain.entity.User;
 import by.academy.fitness.domain.mapper.impl.BaseMapper;
 import by.academy.fitness.domain.mapper.impl.ProductMapper;
+import by.academy.fitness.domain.mapper.impl.UserMapper;
 import by.academy.fitness.domain.validators.ProductValidator;
 import by.academy.fitness.service.interf.IProductService;
 
@@ -38,30 +39,34 @@ public class ProductService implements IProductService {
 	private final UserService userService;
 	private final AuditService auditService;
 	private final BaseMapper<Product, ProductDTO> mapper;
+	private final UserMapper userMapper;
 
 	@Autowired
 	public ProductService(ProductDao productDao, ProductValidator validator, UserService userService,
-			AuditService auditService,ProductMapper mapper) {
+			AuditService auditService, ProductMapper mapper, UserMapper userMapper) {
 		super();
 		this.productDao = productDao;
 		this.validator = validator;
 		this.userService = userService;
 		this.auditService = auditService;
-		this.mapper= mapper;
+		this.mapper = mapper;
+		this.userMapper=userMapper;
 	}
 
 	@Transactional
 	@Override
-	public Product create(ProductDTO dto) {
-		User user = userService.findByEmail(SecurityContextHolder.getContext().getAuthentication().getName());
+	public ProductDTO create(ProductDTO dto) {
+		//UserDTO user = userService.findByEmail(SecurityContextHolder.getContext().getAuthentication().getName());
+		UserDTO user = userService.findByUsername(SecurityContextHolder.getContext().getAuthentication().getName());
 		validator.validate(dto);
-		Product product =mapper.toEntity(dto);
+		Product product = mapper.toEntity(dto);
 		product.setUuid(UUID.randomUUID());
 		product.setDtCreate(LocalDateTime.now().truncatedTo(ChronoUnit.MILLIS));
 		product.setDtUpdate(product.getDtCreate());
-		product.setUser(user);
-		auditService.create(new Audit(CREATED, ESSENCETYPE.PRODUCT, product.getName() + " " + product.getUuid()), UserMapper.userUI(user));
-		return productDao.create(product);
+		product.setUser(new User(user.getId()));
+//		auditService.create(new Audit(CREATED, ESSENCETYPE.PRODUCT, product.getName() + " " + product.getUuid()),
+//				user1);
+		return mapper.toDTO(productDao.create(product));
 	}
 
 	@Transactional
@@ -72,9 +77,10 @@ public class ProductService implements IProductService {
 
 	@Transactional
 	@Override
-	public Page<Product> get(Integer amount, Integer skip, List<Sorting> sortings, List<Filtering> filters) {
-		Page<Product> page = new Page<>();
-		page.setContent(productDao.findAll(amount, skip, sortings, filters));
+	public Page<ProductDTO> get(Integer amount, Integer skip, List<Sorting> sortings, List<Filtering> filters) {
+		Page<ProductDTO> page = new Page<>();
+		page.setContent(productDao.findAll(amount, skip, sortings, filters).stream().map(mapper::toDTO)
+				.collect(Collectors.toList()));
 		page.setPageSize(amount);
 		int count = productDao.count(filters);
 		page.setTotalElements(count);
@@ -99,8 +105,8 @@ public class ProductService implements IProductService {
 
 	@Transactional
 	@Override
-	public Product update(UUID uuid, LocalDateTime dtUpdate, ProductDTO dto) {
-		User user = userService.findByEmail(SecurityContextHolder.getContext().getAuthentication().getName());
+	public ProductDTO update(UUID uuid, LocalDateTime dtUpdate, ProductDTO dto) {
+		UserDTO user = userService.findByUsername(SecurityContextHolder.getContext().getAuthentication().getName());
 		Product readed = productDao.findByUuid(uuid);
 
 		if (readed == null) {
@@ -122,33 +128,36 @@ public class ProductService implements IProductService {
 		readed.setProteins(dto.getProteins());
 		readed.setFats(dto.getFats());
 		readed.setCarbohydrates(dto.getCarbohydrates());
-		readed.setUser(UserMapper.userUI(user));
-		auditService.create(new Audit(UPDATED, ESSENCETYPE.PRODUCT, readed.getName()), UserMapper.userUI(user));
-		return productDao.create(readed);
+		readed.setUser(new User(user.getId()));
+		auditService.create(new Audit(UPDATED, ESSENCETYPE.PRODUCT, readed.getName()), new User(user.getId()));
+		return mapper.toDTO(productDao.create(readed));
 	}
 
 	@Transactional
 	@Override
 	public void delete(UUID uuid, LocalDateTime dtUpdate) {
-		User user = userService.findByEmail(SecurityContextHolder.getContext().getAuthentication().getName());
+		UserDTO user = userService.findByUsername(SecurityContextHolder.getContext().getAuthentication().getName());
 		Product readed = productDao.findByUuid(uuid);
-		if (!readed.getUser().equals(user)) {
-			throw new IllegalArgumentException("You can only delete the product you created");
-		}
 		if (readed == null) {
 			throw new IllegalArgumentException("Item not found");
 		}
+
+		if (!readed.getUser().equals(user)) {
+			throw new IllegalArgumentException("You can only delete the product you created");
+		}
+
 		if (!readed.getDtUpdate().isEqual(dtUpdate)) {
 			throw new IllegalArgumentException("Sorry, this item has already been edited");
 		}
 
-		auditService.create(new Audit(DELETED, ESSENCETYPE.PRODUCT, uuid.toString()), UserMapper.userUI(user));
+		auditService.create(new Audit(DELETED, ESSENCETYPE.PRODUCT, uuid.toString()), new User(user.getId()));
 		productDao.delete(uuid, dtUpdate);
 
 	}
+
 	@Override
-	public Page<Product> get(Pageable pageable) {
-		Page<Product> items = (Page<Product>) productDao.getPage(pageable);
-		return items;
+	public Product readAll(UUID uuid) {
+		return productDao.findByUuid(uuid);
 	}
+
 }

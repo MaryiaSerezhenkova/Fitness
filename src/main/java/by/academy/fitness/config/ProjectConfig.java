@@ -4,6 +4,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.sql.DataSource;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
@@ -56,6 +57,10 @@ public class ProjectConfig extends HikariConfig {
 	@ConfigurationProperties(prefix="spring.datasource")
 	public HikariDataSource primaryDataSource(DataSourceProperties properties) {
 		return properties.initializeDataSourceBuilder().type(HikariDataSource.class).build();
+	}
+	@Bean
+	public ModelMapper modelMapper(){
+		return new ModelMapper();
 	}
 
 	}

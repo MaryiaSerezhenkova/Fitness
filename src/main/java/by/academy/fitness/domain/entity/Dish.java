@@ -40,15 +40,21 @@ public class Dish implements IEntity {
 	private LocalDateTime dtUpdate;
 	@Column
 	private String name;
-	@OneToMany (cascade=CascadeType.ALL, orphanRemoval = true)
+	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
 	@JoinColumn(name = "dish_uuid", referencedColumnName = "uuid")
 	private List<Ingredient> ingredients;
-	@ManyToOne(fetch=FetchType.LAZY)
-    @JoinColumn(name = "user_uuid", referencedColumnName = "uuid")
-    private User user;
+	@ManyToOne
+	//(fetch = FetchType.LAZY)
+	@JoinColumn(name = "user_uuid", referencedColumnName = "uuid")
+	private User user;
 
 	public Dish() {
 		super();
+	}
+
+	public Dish(UUID uuid) {
+		super();
+		this.uuid = uuid;
 	}
 
 	public Dish(UUID uuid, LocalDateTime dtCreate, LocalDateTime dtUpdate, String name) {
@@ -59,7 +65,6 @@ public class Dish implements IEntity {
 		this.name = name;
 	}
 
-	
 	public Dish(UUID uuid, LocalDateTime dtCreate, LocalDateTime dtUpdate, String name, List<Ingredient> ingredients,
 			User user) {
 		super();
@@ -141,7 +146,5 @@ public class Dish implements IEntity {
 		builder.append("]");
 		return builder.toString();
 	}
-
-	
 
 }

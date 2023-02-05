@@ -19,51 +19,47 @@ import org.springframework.web.bind.annotation.RestController;
 
 import by.academy.fitness.domain.dto.DishDTO;
 import by.academy.fitness.domain.dto.PaginationContextDTO;
-import by.academy.fitness.domain.entity.Audit;
-import by.academy.fitness.domain.entity.Dish;
 import by.academy.fitness.domain.entity.Page;
 import by.academy.fitness.service.DishService;
 
 @RestController
 @RequestMapping("/api/v1/dish")
 public class DishController {
-	
+
 	private final DishService dishService;
-	
+
 	@Autowired
 	public DishController(DishService dishService) {
 		super();
 		this.dishService = dishService;
 	}
-	
+
 	@GetMapping(value = "/{uuid}")
-	protected ResponseEntity<Dish> get(@PathVariable UUID uuid) {
+	protected ResponseEntity<DishDTO> get(@PathVariable UUID uuid) {
 		return ResponseEntity.ok(dishService.read(uuid));
 	}
 
 	@GetMapping
-	public ResponseEntity<Page<Dish>> getList(@RequestParam int page, @RequestParam int size) {
+	public ResponseEntity<Page<DishDTO>> getList(@RequestParam int page, @RequestParam int size) {
 		return new ResponseEntity<>(dishService.get(size, page * size, null, null), HttpStatus.OK);
 	}
 
 	@PostMapping(value = "/pagination")
-	protected ResponseEntity<Page<Dish>> getList(@RequestBody PaginationContextDTO paging) {
-	    Page<Dish> page = dishService.get(paging.getAmount(), paging.getSkip(), paging.getSortings(), paging.getFilters());
-	    return ResponseEntity.ok(page);
+	protected ResponseEntity<Page<DishDTO>> getList(@RequestBody PaginationContextDTO paging) {
+		return ResponseEntity
+				.ok(dishService.get(paging.getAmount(), paging.getSkip(), paging.getSortings(), paging.getFilters()));
 	}
-	
+
 	@PostMapping
-	public ResponseEntity<Dish> doPost(@RequestBody DishDTO data) {
-		Dish created = this.dishService.create(data);
-		return new ResponseEntity<>(created, HttpStatus.CREATED);
+	public ResponseEntity<DishDTO> doPost(@RequestBody DishDTO data) {
+		return new ResponseEntity<>(dishService.create(data), HttpStatus.CREATED);
 	}
-	@PutMapping(value="/{uuid}/dtUpdate/{dt_update}")
-	protected ResponseEntity<Dish> doPut(@PathVariable UUID uuid, @PathVariable("dt_update") long dtUpdateRow,
+
+	@PutMapping(value = "/{uuid}/dtUpdate/{dt_update}")
+	protected ResponseEntity<DishDTO> doPut(@PathVariable UUID uuid, @PathVariable("dt_update") long dtUpdateRow,
 			@RequestBody DishDTO data) {
-		LocalDateTime dtUpdate = LocalDateTime.ofInstant(Instant.ofEpochMilli(dtUpdateRow), ZoneId.systemDefault());
-		return ResponseEntity.ok(this.dishService.update(uuid, dtUpdate, data));
+		return ResponseEntity.ok(dishService.update(uuid,
+				LocalDateTime.ofInstant(Instant.ofEpochMilli(dtUpdateRow), ZoneId.systemDefault()), data));
 	}
 
 }
-
-

@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -13,8 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 import by.academy.fitness.dao.Filtering;
 import by.academy.fitness.dao.Sorting;
 import by.academy.fitness.dao.UserDao;
-import by.academy.fitness.domain.builders.UserMapper;
-import by.academy.fitness.domain.dto.UserRegistrationDTO;
+import by.academy.fitness.domain.dto.UserDTO;
 import by.academy.fitness.domain.entity.Audit;
 import by.academy.fitness.domain.entity.Audit.ESSENCETYPE;
 import by.academy.fitness.domain.entity.Page;
@@ -22,35 +22,43 @@ import by.academy.fitness.domain.entity.Role;
 import by.academy.fitness.domain.entity.User;
 import by.academy.fitness.domain.entity.User.ROLE;
 import by.academy.fitness.domain.entity.User.USERSTATUS;
-import by.academy.fitness.domain.validators.RegistrationValidator;
+import by.academy.fitness.domain.mapper.impl.UserMapper;
+import by.academy.fitness.domain.mapper.impl.UserRegistrationMapper;
+import by.academy.fitness.domain.validators.UserValidator;
 import by.academy.fitness.service.interf.IUserService;
 
 @Service
 public class UserService implements IUserService {
-    private final static String WAITING_ACTIVATION = "User sent request for activation";
-    private final static String UPDATED = "User updated";
+	private final static String WAITING_ACTIVATION = "User sent request for activation";
+	private final static String UPDATED = "User updated";
 
 	private final UserDao userDao;
 	private final RoleService roleService;
-	private final RegistrationValidator validator;
+	private final UserValidator validator;
 	private final PasswordEncoder encoder;
 	private final AuditService auditService;
 
+	private final UserMapper mapper;
+	private final UserRegistrationMapper registrationMapper;
+
 	@Autowired
-	public UserService(UserDao userDao, RoleService roleService, RegistrationValidator validator, PasswordEncoder encoder, AuditService auditService) {
+	public UserService(UserDao userDao, RoleService roleService, UserValidator validator, PasswordEncoder encoder,
+			AuditService auditService, UserMapper mapper, UserRegistrationMapper registrationMapper) {
 		this.userDao = userDao;
 		this.roleService = roleService;
 		this.validator = validator;
-		this.encoder=encoder;
-		this.auditService=auditService;
+		this.encoder = encoder;
+		this.auditService = auditService;
+		this.mapper = mapper;
+		this.registrationMapper = registrationMapper;
 	}
 
 	@Transactional
 	@Override
-	public User create(UserRegistrationDTO dto) {
+	public UserDTO create(UserDTO dto) {
 		validator.validate(dto);
 		Role role = roleService.findByName(ROLE.USER);
-		User user = UserMapper.userRegistrationMapping(dto);
+		User user = mapper.toEntity(dto);
 		user.setUuid(UUID.randomUUID());
 		user.setDtCreate(LocalDateTime.now());
 		user.setDtUpdate(user.getDtCreate());
@@ -58,20 +66,21 @@ public class UserService implements IUserService {
 		user.setStatus(USERSTATUS.WAITING_ACTIVATION);
 		user.setPassword(encoder.encode(dto.getPassword()));
 		auditService.create(new Audit(WAITING_ACTIVATION, ESSENCETYPE.USER, user.getUsername()), user);
-		return userDao.create(user);
+		return mapper.toDTO(userDao.create(user));
 	}
 
 	@Transactional
 	@Override
-	public User read(UUID uuid) {
-		return  userDao.findByUuid(uuid);
+	public UserDTO read(UUID uuid) {
+		return mapper.toDTO(userDao.findByUuid(uuid));
 	}
 
 	@Transactional
 	@Override
-	public Page<User> get(Integer amount, Integer skip, List<Sorting> sortings, List<Filtering> filters) {
-		Page<User> page = new Page<>();
-		page.setContent(userDao.findAll(amount, skip, sortings, filters));
+	public Page<UserDTO> get(Integer amount, Integer skip, List<Sorting> sortings, List<Filtering> filters) {
+		Page<UserDTO> page = new Page<>();
+		page.setContent(userDao.findAll(amount, skip, sortings, filters).stream().map(mapper::toDTO)
+				.collect(Collectors.toList()));
 		page.setPageSize(amount);
 		int count = userDao.count(filters);
 		page.setTotalElements(count);
@@ -98,7 +107,7 @@ public class UserService implements IUserService {
 
 	@Transactional
 	@Override
-	public User update(UUID uuid, LocalDateTime dtUpdate, UserRegistrationDTO dto) {
+	public UserDTO update(UUID uuid, LocalDateTime dtUpdate, UserDTO dto) {
 		validator.validate(dto);
 		User readed = userDao.findByUuid(uuid);
 		if (readed == null) {
@@ -113,7 +122,7 @@ public class UserService implements IUserService {
 		readed.setUsername(dto.getUsername());
 		readed.setPassword(dto.getPassword());
 		auditService.create(new Audit(UPDATED, ESSENCETYPE.USER, readed.getUsername()), readed);
-		return userDao.create(readed);
+		return mapper.toDTO(userDao.create(readed));
 	}
 
 	@Transactional
@@ -132,57 +141,23 @@ public class UserService implements IUserService {
 	}
 
 	@Transactional
-	@Override
-	public User updateRole(UUID uuid, Set<Role> role, LocalDateTime dtUpdate) {
-		User readed = userDao.findByUuid(uuid);
-		if (readed == null) {
-			throw new IllegalArgumentException("Not found");
-		}
-		 if (!readed.getDtUpdate().isEqual(dtUpdate)) {
-			throw new IllegalArgumentException("Version is outdated");
-		}
-		 readed.setRoles(role);
-		return userDao.update(uuid, dtUpdate, readed);
-
-	}
-
-	@Transactional
-	@Override
-	public User updateStatus(UUID uuid, USERSTATUS status, LocalDateTime dtUpdate) {
-		User readed = userDao.findByUuid(uuid);
-		if (readed == null) {
-			throw new IllegalArgumentException("Not found");
-		}
-		 if (!readed.getDtUpdate().isEqual(dtUpdate)) {
-			throw new IllegalArgumentException("Version is outdated");
-		}
-		readed.setStatus(status);
-		return userDao.create(readed);
-	}
-
-	@Transactional
 	public Boolean existsByEmail(String email) {
 		return userDao.existsByEmail(email);
 	}
 
 	@Transactional
-	public User findByEmail(String email) {
-		return userDao.findByEmail(email);
+	public UserDTO findByEmail(String email) {
+		return mapper.toDTO(userDao.findByEmail(email));
 	}
+
 	@Transactional
 	public Boolean existsByUsername(String username) {
 		return userDao.existsByUsername(username);
 	}
 
 	@Transactional
-	public User findByUsername(String username) {
-		return userDao.findByUsername(username);
-	}
-
-	@Override
-	public User updateRole(UUID uuid, ROLE role, LocalDateTime dtUpdate) {
-		// TODO Auto-generated method stub
-		return null;
+	public UserDTO findByUsername(String username) {
+		return mapper.toDTO(userDao.findByUsername(username));
 	}
 
 }

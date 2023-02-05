@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -13,15 +14,18 @@ import org.springframework.transaction.annotation.Transactional;
 import by.academy.fitness.dao.DishDao;
 import by.academy.fitness.dao.Filtering;
 import by.academy.fitness.dao.Sorting;
-import by.academy.fitness.domain.builders.UserMapper;
 import by.academy.fitness.domain.dto.DishDTO;
 import by.academy.fitness.domain.dto.IngredientDTO;
+import by.academy.fitness.domain.dto.UserDTO;
 import by.academy.fitness.domain.entity.Audit;
+import by.academy.fitness.domain.entity.Audit.ESSENCETYPE;
 import by.academy.fitness.domain.entity.Dish;
 import by.academy.fitness.domain.entity.Ingredient;
 import by.academy.fitness.domain.entity.Page;
+import by.academy.fitness.domain.entity.Product;
 import by.academy.fitness.domain.entity.User;
-import by.academy.fitness.domain.entity.Audit.ESSENCETYPE;
+import by.academy.fitness.domain.mapper.impl.DishMapper;
+import by.academy.fitness.domain.mapper.impl.UserMapper;
 import by.academy.fitness.domain.validators.DishValidator;
 import by.academy.fitness.service.interf.IDishService;
 
@@ -32,26 +36,30 @@ public class DishService implements IDishService {
 	private final static String DELETED = "Dish deleted";
 
 	private final DishDao dishDao;
-	private final ProductService productService;
 	private final DishValidator validator;
 	private final UserService userService;
 	private final AuditService auditService;
+	private final DishMapper mapper;
+	private final UserMapper userMapper;
 
 	@Autowired
 	public DishService(DishDao dishDao, ProductService productService, DishValidator validator, UserService userService,
-			AuditService auditService) {
+			AuditService auditService, DishMapper mapper, UserMapper userMapper) {
 		super();
 		this.dishDao = dishDao;
-		this.productService = productService;
 		this.validator = validator;
 		this.userService = userService;
 		this.auditService = auditService;
+		this.mapper = mapper;
+		this.userMapper=userMapper;
 	}
 
 	@Transactional
 	@Override
-	public Dish create(DishDTO dto) {
-		User user = userService.findByEmail(SecurityContextHolder.getContext().getAuthentication().getName());
+	public DishDTO create(DishDTO dto) {
+		String email = SecurityContextHolder.getContext().getAuthentication().getName();
+		System.out.println(email);
+		UserDTO user = userService.findByEmail(SecurityContextHolder.getContext().getAuthentication().getName());
 		Dish dish = new Dish();
 		validator.validate(dto);
 		dish.setUuid(UUID.randomUUID());
@@ -63,34 +71,34 @@ public class DishService implements IDishService {
 		for (IngredientDTO i : dto.getIngredients()) {
 			Ingredient x = new Ingredient();
 			x.setUuid(UUID.randomUUID());
-			x.setProduct(productService.read(i.getProductUuid()));
+			x.setProduct(new Product(i.getProductUuid()));
 			x.setWeight(i.getWeight());
 			ingr.add(x);
 		}
 		dish.setIngredients(ingr);
-		dish.setUser(UserMapper.userUI(user));
+		dish.setUser(new User(user.getId()));
 		auditService.create(new Audit(CREATED, ESSENCETYPE.DISH, dish.getName() + " " + dish.getUuid().toString()),
-				UserMapper.userUI(user));
+				dish.getUser());
 
-		return dishDao.create(dish);
+		return mapper.toDTO(dishDao.create(dish));
 	}
 
 	@Transactional
-	public Dish read(UUID uuid) {
-		return dishDao.findByUuid(uuid);
+	public DishDTO read(UUID uuid) {
+		return mapper.toDTO(dishDao.findByUuid(uuid));
 	}
 
 	@Transactional
 	@Override
-	public Dish update(UUID uuid, LocalDateTime dtUpdate, DishDTO dto) {
-		User user = userService.findByEmail(SecurityContextHolder.getContext().getAuthentication().getName());
+	public DishDTO update(UUID uuid, LocalDateTime dtUpdate, DishDTO dto) {
+		UserDTO user = userService.findByEmail(SecurityContextHolder.getContext().getAuthentication().getName());
 		Dish readed = dishDao.findByUuid(uuid);
 
 		if (readed == null) {
 			throw new IllegalArgumentException("Item not found");
 		}
 		if (!readed.getUser().equals(user)) {
-			throw new IllegalArgumentException("You can only update the product you created");	
+			throw new IllegalArgumentException("You can only update the product you created");
 		}
 
 		if (!readed.getDtUpdate().isEqual(dtUpdate)) {
@@ -103,34 +111,35 @@ public class DishService implements IDishService {
 		for (IngredientDTO i : dto.getIngredients()) {
 			Ingredient x = new Ingredient();
 			x.setUuid(UUID.randomUUID());
-			x.setProduct(productService.read(i.getProductUuid()));
+			x.setProduct(new Product(i.getProductUuid()));
 			x.setWeight(i.getWeight());
 			ingr.add(x);
 		}
 		readed.setIngredients(ingr);
 		auditService.create(new Audit(UPDATED, ESSENCETYPE.DISH, readed.getName() + " " + readed.getUuid().toString()),
-				UserMapper.userUI(user));
+				userMapper.toEntity(user));
 
-		return dishDao.create(readed);
+		return mapper.toDTO(dishDao.create(readed));
 	}
 
 	@Transactional
 	@Override
 	public void delete(UUID uuid, LocalDateTime dtUpdate) {
-		User user = userService.findByEmail(SecurityContextHolder.getContext().getAuthentication().getName());
+		UserDTO user = userService.findByEmail(SecurityContextHolder.getContext().getAuthentication().getName());
 		if (!dishDao.findByUuid(uuid).getUser().equals(user)) {
 			throw new IllegalArgumentException("You can only delete the product you created");
 		}
-		auditService.create(new Audit(DELETED, ESSENCETYPE.DISH, uuid.toString()), UserMapper.userUI(user));
+		auditService.create(new Audit(DELETED, ESSENCETYPE.DISH, uuid.toString()), new User(user.getId()));
 		dishDao.delete(uuid, dtUpdate);
 
 	}
 
 	@Transactional
 	@Override
-	public Page<Dish> get(Integer amount, Integer skip, List<Sorting> sortings, List<Filtering> filters) {
-		Page<Dish> page = new Page<>();
-		page.setContent(dishDao.findAll(amount, skip, sortings, filters));
+	public Page<DishDTO> get(Integer amount, Integer skip, List<Sorting> sortings, List<Filtering> filters) {
+		Page<DishDTO> page = new Page<>();
+		page.setContent(dishDao.findAll(amount, skip, sortings, filters).stream().map(mapper::toDTO)
+				.collect(Collectors.toList()));
 		page.setPageSize(amount);
 		int count = dishDao.count(filters);
 		page.setTotalElements(count);

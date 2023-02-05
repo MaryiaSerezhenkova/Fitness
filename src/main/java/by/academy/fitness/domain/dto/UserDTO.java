@@ -1,17 +1,37 @@
 package by.academy.fitness.domain.dto;
 
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonProperty.Access;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+
+import by.academy.fitness.config.CustomLocalDateTimeDesSerializer;
+import by.academy.fitness.config.CustomLocalDateTimeSerializer;
 import by.academy.fitness.domain.entity.Role;
 import by.academy.fitness.domain.entity.User.USERSTATUS;
 
 public class UserDTO {
+
+	@JsonProperty(access = Access.READ_ONLY)
+	private UUID id;
 	private String email;
 	private String username;
 	private Set<Role> roles = new HashSet<>();
 	private USERSTATUS status;
 	private String password;
+	@JsonProperty(access = Access.READ_ONLY)
+	@JsonSerialize(using = CustomLocalDateTimeSerializer.class)
+	@JsonDeserialize(using = CustomLocalDateTimeDesSerializer.class)
+	private LocalDateTime dtCreate;
+	@JsonProperty(access = Access.READ_ONLY)
+	@JsonSerialize(using = CustomLocalDateTimeSerializer.class)
+	@JsonDeserialize(using = CustomLocalDateTimeDesSerializer.class)
+	private LocalDateTime dtUpdate;
 
 	public UserDTO() {
 		super();
@@ -24,6 +44,30 @@ public class UserDTO {
 		this.roles = roles;
 		this.status = status;
 		this.password = password;
+	}
+
+	public UUID getId() {
+		return id;
+	}
+
+	public void setId(UUID id) {
+		this.id = id;
+	}
+
+	public LocalDateTime getDtCreate() {
+		return dtCreate;
+	}
+
+	public void setDtCreate(LocalDateTime dtCreate) {
+		this.dtCreate = dtCreate;
+	}
+
+	public LocalDateTime getDtUpdate() {
+		return dtUpdate;
+	}
+
+	public void setDtUpdate(LocalDateTime dtUpdate) {
+		this.dtUpdate = dtUpdate;
 	}
 
 	public String getEmail() {

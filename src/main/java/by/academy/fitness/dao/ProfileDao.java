@@ -46,7 +46,17 @@ public class ProfileDao extends BaseEntityDAO<UUID, Profile> implements IProfile
 
 	@Override
 	public Boolean existsByUser(User user) {
-		return findByUser(user)!=null;
+		return findByUser(user) != null;
+	}
+
+	public Profile findByUserId(UUID id) {
+		CriteriaBuilder builder = getEntityManager().getCriteriaBuilder();
+		CriteriaQuery<Profile> criteria = builder.createQuery(getClazz());
+		Root<Profile> root = criteria.from(getClazz());
+		criteria.select(root);
+
+		criteria.where(builder.equal(root.get("user_uuid"), id));
+		return getEntityManager().createQuery(criteria).getResultList().stream().findFirst().orElse(null);
 	}
 
 }

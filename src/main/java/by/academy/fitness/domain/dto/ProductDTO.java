@@ -1,34 +1,44 @@
 package by.academy.fitness.domain.dto;
 
-
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonProperty.Access;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
+import by.academy.fitness.config.CustomLocalDateTimeDesSerializer;
+import by.academy.fitness.config.CustomLocalDateTimeSerializer;
 import by.academy.fitness.domain.entity.Product.UNIT;
 
-
-
-public class ProductDTO  {
-	@JsonProperty(access=Access.READ_ONLY)
+public class ProductDTO {
+//	@JsonProperty(access = Access.READ_ONLY)
 	private UUID id;
 	private String name;
 	private int weight;
 	private UNIT unit;
 	private int colories;
-	private double  proteins;
-	private double  fats;
-	private double  carbohydrates;
-	@JsonProperty(access=Access.READ_ONLY)
+	private double proteins;
+	private double fats;
+	private double carbohydrates;
+//	@JsonProperty(access = Access.READ_ONLY)
 	private UserShortViewDTO user;
-	
-	
+//	@JsonProperty(access = Access.READ_ONLY)
+	@JsonSerialize(using = CustomLocalDateTimeSerializer.class)
+	@JsonDeserialize(using = CustomLocalDateTimeDesSerializer.class)
+	private LocalDateTime dtCreate;
+//JsonProperty(access = Access.READ_ONLY)
+	@JsonSerialize(using = CustomLocalDateTimeSerializer.class)
+	@JsonDeserialize(using = CustomLocalDateTimeDesSerializer.class)
+	private LocalDateTime dtUpdate;
+
 	public ProductDTO() {
 		super();
 	}
 
-	public ProductDTO(String name, int weight, UNIT unit, int colories, double  proteins, double  fats, double carbohydrates) {
+	public ProductDTO(String name, int weight, UNIT unit, int colories, double proteins, double fats,
+			double carbohydrates) {
 		super();
 		this.name = name;
 		this.weight = weight;
@@ -71,23 +81,23 @@ public class ProductDTO  {
 		this.colories = colories;
 	}
 
-	public double  getProteins() {
+	public double getProteins() {
 		return proteins;
 	}
 
-	public void setProteins(double  proteins) {
+	public void setProteins(double proteins) {
 		this.proteins = proteins;
 	}
 
-	public double  getFats() {
+	public double getFats() {
 		return fats;
 	}
 
-	public void setFats(double  fats) {
+	public void setFats(double fats) {
 		this.fats = fats;
 	}
 
-	public double  getCarbohydrates() {
+	public double getCarbohydrates() {
 		return carbohydrates;
 	}
 
@@ -116,6 +126,4 @@ public class ProductDTO  {
 		return builder.toString();
 	}
 
-	
-	
 }

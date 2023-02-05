@@ -50,7 +50,8 @@ public class Diary implements IEntity {
 	@JsonSerialize(using = CustomLocalDateTimeSerializer.class)
 	@JsonDeserialize(using = CustomLocalDateTimeDesSerializer.class)
 	private LocalDateTime mealTime;
-	@ManyToOne(fetch=FetchType.LAZY)
+	@ManyToOne
+	//(fetch=FetchType.LAZY)
 	@JoinColumn(name = "profile_uuid", referencedColumnName = "uuid")
 	private Profile profile;
 

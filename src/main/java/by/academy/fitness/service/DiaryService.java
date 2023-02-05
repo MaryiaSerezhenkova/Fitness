@@ -3,6 +3,7 @@ package by.academy.fitness.service;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -12,14 +13,18 @@ import org.springframework.transaction.annotation.Transactional;
 import by.academy.fitness.dao.DiaryDao;
 import by.academy.fitness.dao.Filtering;
 import by.academy.fitness.dao.Sorting;
-import by.academy.fitness.domain.builders.UserMapper;
 import by.academy.fitness.domain.dto.DiaryDTO;
+import by.academy.fitness.domain.dto.ProfileDTO;
+import by.academy.fitness.domain.dto.UserDTO;
 import by.academy.fitness.domain.entity.Audit;
 import by.academy.fitness.domain.entity.Audit.ESSENCETYPE;
 import by.academy.fitness.domain.entity.Diary;
+import by.academy.fitness.domain.entity.Dish;
 import by.academy.fitness.domain.entity.Page;
+import by.academy.fitness.domain.entity.Product;
 import by.academy.fitness.domain.entity.Profile;
 import by.academy.fitness.domain.entity.User;
+import by.academy.fitness.domain.mapper.impl.DiaryMapper;
 import by.academy.fitness.domain.validators.DiaryValidator;
 import by.academy.fitness.service.interf.IDiaryService;
 
@@ -30,60 +35,61 @@ public class DiaryService implements IDiaryService {
 	private final static String DELETED = "Food diary entry deleted";
 
 	private final DiaryDao diaryDao;
-	private final ProductService productService;
-	private final DishService dishService;
 	private final DiaryValidator validator;
 	private final UserService userService;
 	private final AuditService auditService;
 	private final ProfileService profileService;
+	private final DiaryMapper mapper;
 
 	@Autowired
-	public DiaryService(DiaryDao diaryDao, ProductService productService, DishService dishService,
-			DiaryValidator validator, UserService userService, AuditService auditService,
-			ProfileService profileService) {
+	public DiaryService(DiaryDao diaryDao, DishService dishService, DiaryValidator validator, UserService userService,
+			AuditService auditService, ProfileService profileService, DiaryMapper mapper) {
 		super();
 		this.diaryDao = diaryDao;
-		this.productService = productService;
-		this.dishService = dishService;
 		this.validator = validator;
 		this.userService = userService;
 		this.auditService = auditService;
 		this.profileService = profileService;
+		this.mapper = mapper;
 	}
 
 	@Transactional
 	@Override
-	public Diary create(DiaryDTO dto) {
-		User user = userService.findByEmail(SecurityContextHolder.getContext().getAuthentication().getName());
-		Diary diary = new Diary();
+	public DiaryDTO create(DiaryDTO dto) {
+		UserDTO user = userService.findByEmail(SecurityContextHolder.getContext().getAuthentication().getName());
 		validator.validate(dto);
+		Diary diary = mapper.toEntity(dto);
+
+		ProfileDTO profile = profileService.findByUserId(user.getId());
 		diary.setUuid(UUID.randomUUID());
+
 		diary.setDtCreate(LocalDateTime.now());
 		diary.setDtUpdate(diary.getDtCreate());
 		if (dto.getDishUuid() != null) {
-			diary.setDish(dishService.read(dto.getDishUuid()));
+			diary.setDish(new Dish(dto.getDishUuid()));
 		}
 		if (dto.getProductUuid() != null) {
-			diary.setProduct(productService.read(dto.getProductUuid()));
+			diary.setProduct(new Product(dto.getProductUuid()));
 		}
 		diary.setWeight(dto.getWeight());
 		diary.setMealTime(dto.getMealTime());
-		diary.setProfile(profileService.findByUser(user));
-		auditService.create(new Audit(CREATED, ESSENCETYPE.DIARY, diary.getUuid().toString()), UserMapper.userUI(user));
-		return diaryDao.create(diary);
+		diary.setProfile(new Profile(profile.getId()));
+		auditService.create(new Audit(CREATED, ESSENCETYPE.DIARY, diary.getUuid().toString()), new User(user.getId()));
+		return mapper.toDTO(diaryDao.create(diary));
 	}
 
 	@Transactional
 	@Override
-	public Diary read(UUID uuid) {
-		return diaryDao.findByUuid(uuid);
+	public DiaryDTO read(UUID uuid) {
+		return mapper.toDTO(diaryDao.findByUuid(uuid));
 	}
 
 	@Transactional
 	@Override
-	public Page<Diary> get(Integer amount, Integer skip, List<Sorting> sortings, List<Filtering> filters) {
-		Page<Diary> page = new Page<>();
-		page.setContent(diaryDao.findAll(amount, skip, sortings, filters));
+	public Page<DiaryDTO> get(Integer amount, Integer skip, List<Sorting> sortings, List<Filtering> filters) {
+		Page<DiaryDTO> page = new Page<>();
+		page.setContent(diaryDao.findAll(amount, skip, sortings, filters).stream().map(mapper::toDTO)
+				.collect(Collectors.toList()));
 		page.setPageSize(amount);
 		int count = diaryDao.count(filters);
 		page.setTotalElements(count);
@@ -107,8 +113,8 @@ public class DiaryService implements IDiaryService {
 
 	@Transactional
 	@Override
-	public Diary update(UUID uuid, LocalDateTime dtUpdate, DiaryDTO dto) {
-		User user = userService.findByEmail(SecurityContextHolder.getContext().getAuthentication().getName());
+	public DiaryDTO update(UUID uuid, LocalDateTime dtUpdate, DiaryDTO dto) {
+		UserDTO user = userService.findByEmail(SecurityContextHolder.getContext().getAuthentication().getName());
 		Diary readed = diaryDao.findByUuid(uuid);
 
 		if (readed == null) {
@@ -125,23 +131,23 @@ public class DiaryService implements IDiaryService {
 		readed.setDtUpdate(LocalDateTime.now());
 		readed.setWeight(dto.getWeight());
 		if (dto.getProductUuid() != null) {
-			readed.setProduct(productService.read(dto.getProductUuid()));
+			readed.setProduct(new Product(dto.getProductUuid()));
 		}
 		if (dto.getDishUuid() != null) {
-			readed.setDish(dishService.read(dto.getDishUuid()));
+			readed.setDish(new Dish(dto.getDishUuid()));
 		}
 		readed.setMealTime(dto.getMealTime());
-		auditService.create(new Audit(UPDATED, ESSENCETYPE.DIARY, readed.getUuid().toString()), UserMapper.userUI(user));
+		auditService.create(new Audit(UPDATED, ESSENCETYPE.DIARY, readed.getUuid().toString()), new User(user.getId()));
 
-		return diaryDao.create(readed);
+		return mapper.toDTO(diaryDao.create(readed));
 	}
 
 	@Transactional
 	@Override
 	public void delete(UUID uuid, LocalDateTime dtUpdate) {
-		User user = userService.findByEmail(SecurityContextHolder.getContext().getAuthentication().getName());
+		UserDTO user = userService.findByEmail(SecurityContextHolder.getContext().getAuthentication().getName());
 		auditService.create(new Audit(DELETED, ESSENCETYPE.DIARY, diaryDao.findByUuid(uuid).getUuid().toString()),
-				UserMapper.userUI(user));
+				new User(user.getId()));
 		diaryDao.delete(uuid, dtUpdate);
 
 	}

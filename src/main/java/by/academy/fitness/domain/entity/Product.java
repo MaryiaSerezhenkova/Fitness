@@ -59,9 +59,9 @@ public class Product implements IEntity {
 	private double fats;
 	@Column
 	private double carbohydrates;
-	@ManyToOne(fetch=FetchType.LAZY)
+	@ManyToOne
+	//(fetch = FetchType.LAZY)
 	@JoinColumn(name = "user_uuid", referencedColumnName = "uuid")
-//	@LazyToOne(LazyToOneOption.PROXY)
 	private User user;
 
 	public Product() {
@@ -82,6 +82,11 @@ public class Product implements IEntity {
 		this.fats = fats;
 		this.carbohydrates = carbohydrates;
 		this.user = user;
+	}
+
+	public Product(UUID uuid) {
+		super();
+		this.uuid = uuid;
 	}
 
 	public Product(String name, int weight, UNIT unit, int colories, double proteins, double fats,

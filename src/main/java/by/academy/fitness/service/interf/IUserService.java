@@ -1,23 +1,13 @@
 package by.academy.fitness.service.interf;
 
-import java.time.LocalDateTime;
-import java.util.Set;
-import java.util.UUID;
-
-import by.academy.fitness.domain.dto.UserRegistrationDTO;
-import by.academy.fitness.domain.entity.Role;
+import by.academy.fitness.domain.dto.UserDTO;
 import by.academy.fitness.domain.entity.User;
-import by.academy.fitness.domain.entity.User.ROLE;
-import by.academy.fitness.domain.entity.User.USERSTATUS;
 
-public interface IUserService extends IService<User, UserRegistrationDTO> {
+public interface IUserService extends IService<User, UserDTO> {
 
-	User updateRole(UUID uuid, ROLE role, LocalDateTime dtUpdate);
 
-	User updateStatus(UUID uuid, USERSTATUS status, LocalDateTime dtUpdate);
+	UserDTO findByEmail(String email);
 
-	User findByEmail(String email);
-
-	User updateRole(UUID uuid, Set<Role> role, LocalDateTime dtUpdate);
+	UserDTO findByUsername(String username);
 
 }

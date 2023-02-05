@@ -15,13 +15,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import by.academy.fitness.domain.dto.LoginDTO;
 import by.academy.fitness.domain.dto.UserDTO;
-import by.academy.fitness.domain.dto.UserRegistrationDTO;
 import by.academy.fitness.security.UserDetailsImpl;
 import by.academy.fitness.security.jwt.JwtUtils;
 import by.academy.fitness.security.payload.JwtResponse;
 import by.academy.fitness.security.payload.MessageResponse;
-import by.academy.fitness.service.RoleService;
-import by.academy.fitness.service.UserDetailsServiceImpl;
 import by.academy.fitness.service.UserService;
 import by.academy.fitness.service.VerificationService;
 
@@ -31,21 +28,16 @@ public class AuthController {
 
 	private final AuthenticationManager authenticationManager;
 	private final JwtUtils jwtUtils;
-	private final UserDetailsServiceImpl userDetailsService;
 	private final UserService userService;
-	private final RoleService roleService;
 	private final VerificationService verificationService;
 
 	@Autowired
-	public AuthController(AuthenticationManager authenticationManager, JwtUtils jwtUtils,
-			UserDetailsServiceImpl userDetailsService, UserService userService, RoleService roleService,
+	public AuthController(AuthenticationManager authenticationManager, JwtUtils jwtUtils, UserService userService,
 			VerificationService verificationService) {
 		super();
 		this.authenticationManager = authenticationManager;
 		this.jwtUtils = jwtUtils;
-		this.userDetailsService = userDetailsService;
 		this.userService = userService;
-		this.roleService = roleService;
 		this.verificationService = verificationService;
 	}
 
@@ -62,8 +54,7 @@ public class AuthController {
 //		List<String> roles = userDetails.getAuthorities().stream().map(item -> item.getAuthority())
 //				.collect(Collectors.toList());
 
-		return ResponseEntity.ok(
-				new JwtResponse(jwt, userDetails.getUuid(),userDetails.getEmail()));
+		return ResponseEntity.ok(new JwtResponse(jwt, userDetails.getUuid(), userDetails.getEmail()));
 	}
 
 //	@PostMapping("/signup")
@@ -85,7 +76,7 @@ public class AuthController {
 //				.ok(new MessageResponse("User registered successfully!Please check your email for verification link."));
 //	}
 	@PostMapping("/signup")
-	public ResponseEntity<?> registerUser(@RequestBody UserRegistrationDTO data) {
+	public ResponseEntity<?> registerUser(@RequestBody UserDTO data) {
 		if (userService.existsByUsername(data.getUsername())) {
 			return ResponseEntity.badRequest().body(new MessageResponse("Error: Username is already taken!"));
 		}
@@ -102,11 +93,11 @@ public class AuthController {
 		return ResponseEntity
 				.ok(new MessageResponse("You registered successfully! Please check your email for verification link."));
 	}
+
 	@PostMapping
 	public ResponseEntity<?> addUser(@RequestBody UserDTO data) {
 		verificationService.waitingActivation(data);
-		return ResponseEntity
-				.ok(new MessageResponse("User saved to database. Token sent to email"));
+		return ResponseEntity.ok(new MessageResponse("User saved to database. Token sent to email"));
 	}
 
 	@GetMapping("/verify/{token}")

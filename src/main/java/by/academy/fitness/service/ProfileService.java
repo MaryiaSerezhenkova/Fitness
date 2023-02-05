@@ -13,14 +13,14 @@ import org.springframework.transaction.annotation.Transactional;
 import by.academy.fitness.dao.Filtering;
 import by.academy.fitness.dao.ProfileDao;
 import by.academy.fitness.dao.Sorting;
-import by.academy.fitness.domain.builders.ProfileMapper;
-import by.academy.fitness.domain.builders.UserMapper;
 import by.academy.fitness.domain.dto.ProfileDTO;
+import by.academy.fitness.domain.dto.UserDTO;
 import by.academy.fitness.domain.entity.Audit;
 import by.academy.fitness.domain.entity.Audit.ESSENCETYPE;
 import by.academy.fitness.domain.entity.Page;
 import by.academy.fitness.domain.entity.Profile;
 import by.academy.fitness.domain.entity.User;
+import by.academy.fitness.domain.mapper.impl.ProfileMapper;
 import by.academy.fitness.service.interf.IProfileService;
 
 @Service
@@ -33,46 +33,49 @@ public class ProfileService implements IProfileService {
 	private final ProfileDao profileDao;
 	private final UserService userService;
 	private final AuditService auditService;
+	private final ProfileMapper mapper;
 
 	@Autowired
-	public ProfileService(ProfileDao profileDao, UserService userService, AuditService auditService) {
+	public ProfileService(ProfileDao profileDao, UserService userService, AuditService auditService,
+			ProfileMapper mapper) {
 		super();
 		this.profileDao = profileDao;
 		this.userService = userService;
 		this.auditService = auditService;
+		this.mapper = mapper;
 	}
 
 	@Transactional
 	@Override
-	public Profile create(ProfileDTO dto) {
-		User user = userService.findByEmail(SecurityContextHolder.getContext().getAuthentication().getName());
-		Profile profile = ProfileMapper.profileInputMapping(dto);
+	public ProfileDTO create(ProfileDTO dto) {
+		UserDTO user = userService.findByEmail(SecurityContextHolder.getContext().getAuthentication().getName());
+		Profile profile = mapper.toEntity(dto);
 		profile.setUuid(UUID.randomUUID());
 		profile.setDtCreate(LocalDateTime.now().truncatedTo(ChronoUnit.MILLIS));
 		profile.setDtUpdate(profile.getDtCreate());
-		profile.setUser(UserMapper.userUI(user));
-		auditService.create(new Audit(CREATED, ESSENCETYPE.PROFILE, profile.getUuid().toString()), user);
-		return ProfileMapper.profileOutputMapping(profileDao.create(profile));
+		profile.setUser(new User(user.getId()));
+		auditService.create(new Audit(CREATED, ESSENCETYPE.PROFILE, profile.getUuid().toString()),
+				new User(user.getId()));
+		return mapper.toDTO(profileDao.create(profile));
 	}
 
 	@Transactional
 	@Override
-	public Profile read(UUID uuid) {
-		User user = userService.findByEmail(SecurityContextHolder.getContext().getAuthentication().getName());
-		return profileDao.findByUuid(uuid);
+	public ProfileDTO read(UUID uuid) {
+		return mapper.toDTO(profileDao.findByUuid(uuid));
 	}
 
 	@Transactional
 	@Override
-	public Page<Profile> get(Integer amount, Integer skip, List<Sorting> sortings, List<Filtering> filters) {
+	public Page<ProfileDTO> get(Integer amount, Integer skip, List<Sorting> sortings, List<Filtering> filters) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Transactional
 	@Override
-	public Profile update(UUID uuid, LocalDateTime dtUpdate, ProfileDTO dto) {
-		User user = userService.findByEmail(SecurityContextHolder.getContext().getAuthentication().getName());
+	public ProfileDTO update(UUID uuid, LocalDateTime dtUpdate, ProfileDTO dto) {
+		UserDTO user = userService.findByEmail(SecurityContextHolder.getContext().getAuthentication().getName());
 		Profile readed = profileDao.findByUuid(uuid);
 
 		if (readed == null) {
@@ -92,34 +95,41 @@ public class ProfileService implements IProfileService {
 		readed.setTarget(dto.getTarget());
 		readed.setType(dto.getType());
 		readed.setGender(dto.getGender());
-		readed.setUser(UserMapper.userUI(user));
-		auditService.create(new Audit(UPDATED, ESSENCETYPE.PROFILE, readed.getUuid().toString()), UserMapper.userUI(user));
-		return profileDao.create(readed);
+		readed.setUser(new User(user.getId()));
+		auditService.create(new Audit(UPDATED, ESSENCETYPE.PROFILE, readed.getUuid().toString()),
+				new User(user.getId()));
+		return mapper.toDTO(profileDao.create(readed));
 	}
 
 	@Transactional
 	@Override
 	public void delete(UUID uuid, LocalDateTime dtUpdate) {
-		User user = userService.findByEmail(SecurityContextHolder.getContext().getAuthentication().getName());
-		Profile readed = profileDao.findByUuid(uuid);
+		UserDTO user = userService.findByEmail(SecurityContextHolder.getContext().getAuthentication().getName());
+		ProfileDTO profile = mapper.toDTO(profileDao.findByUuid(uuid));
 
-		if (readed == null) {
+		if (profile == null) {
 			throw new IllegalArgumentException("Item not found");
 		}
-		if (!readed.getUser().equals(user)) {
+		if (!profile.getUser().equals(user)) {
 			throw new IllegalArgumentException("You can only update the profile you created");
 		}
 
-		if (!readed.getDtUpdate().isEqual(dtUpdate)) {
+		if (!profile.getDtUpdate().isEqual(dtUpdate)) {
 			throw new IllegalArgumentException("Sorry, this item has already been edited");
 		}
-		auditService.create(new Audit(DELETED, ESSENCETYPE.PROFILE, readed.getUuid().toString()), UserMapper.userUI(user));
+		auditService.create(new Audit(DELETED, ESSENCETYPE.PROFILE, profile.getId().toString()),
+				new User(user.getId()));
 		profileDao.delete(uuid, dtUpdate);
 	}
 
 	@Override
 	public Profile findByUser(User user) {
 		return profileDao.findByUser(user);
+	}
+
+	@Override
+	public ProfileDTO findByUserId(UUID id) {
+		return mapper.toDTO(profileDao.findByUserId(id));
 	}
 
 }

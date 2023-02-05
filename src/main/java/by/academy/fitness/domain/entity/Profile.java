@@ -18,30 +18,30 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import by.academy.fitness.config.CustomLocalDateTimeDesSerializer;
 import by.academy.fitness.config.CustomLocalDateTimeSerializer;
+
 @Entity
 @Table(name = "profile", schema = "app")
 public class Profile implements IEntity {
-	
-	
-	private static final long serialVersionUID = 1L;
 
+	private static final long serialVersionUID = 1L;
 
 	public enum ACTIVITY_TYPE {
 		ACTIVE, NOT_ACTIVE
 
 	}
+
 	public enum GENDER {
 		MALE, FEMALE
 	}
-	
+
 	@Id
 	private UUID uuid;
-	
+
 	@Column(name = "dt_create")
 	@JsonSerialize(using = CustomLocalDateTimeSerializer.class)
 	@JsonDeserialize(using = CustomLocalDateTimeDesSerializer.class)
 	private LocalDateTime dtCreate;
-	
+
 	@Column(name = "dt_update")
 	@Version
 	@JsonSerialize(using = CustomLocalDateTimeSerializer.class)
@@ -51,7 +51,7 @@ public class Profile implements IEntity {
 	private int height;
 	@Column
 	private double weight;
-	@Column (name="dt_birthday")
+	@Column(name = "dt_birthday")
 	private String dtBirthday;
 	@Column
 	private double target;
@@ -65,10 +65,14 @@ public class Profile implements IEntity {
 	@OneToOne
 	@JoinColumn(name = "user_uuid", referencedColumnName = "uuid")
 	private User user;
-	
-	
+
 	public Profile() {
 		super();
+	}
+
+	public Profile(UUID uuid) {
+		super();
+		this.uuid = uuid;
 	}
 
 	public Profile(UUID uuid, LocalDateTime dtCreate, LocalDateTime dtUpdate, int height, double weight,
@@ -86,9 +90,7 @@ public class Profile implements IEntity {
 		this.user = user;
 	}
 
-
-	public Profile(int height, double weight, String dtBirthday, double target, ACTIVITY_TYPE type,
-			GENDER gender) {
+	public Profile(int height, double weight, String dtBirthday, double target, ACTIVITY_TYPE type, GENDER gender) {
 		this.height = height;
 		this.weight = weight;
 		this.dtBirthday = dtBirthday;

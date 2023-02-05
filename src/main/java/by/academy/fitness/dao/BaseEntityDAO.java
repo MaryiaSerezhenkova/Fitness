@@ -200,16 +200,5 @@ public abstract class BaseEntityDAO<I, E extends IEntity> implements IDao<E> {
 	}
 
 	protected abstract Class<E> getClazz();
-	
-	public List<E> getPage (Pageable pageable) {
-		CriteriaBuilder builder = getEntityManager().getCriteriaBuilder();
-		CriteriaQuery<E> criteria = builder.createQuery(getClazz());
-		Root<E> root = criteria.from(getClazz());
-		criteria.select(root);
-		TypedQuery<E> q = getEntityManager().createQuery(criteria);
-
-		return q.getResultList();
-		
-	}
 
 }

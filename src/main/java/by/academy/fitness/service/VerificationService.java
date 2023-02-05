@@ -10,12 +10,12 @@ import org.springframework.web.util.UriUtils;
 
 import by.academy.fitness.dao.VerificationDao;
 import by.academy.fitness.domain.dto.UserDTO;
-import by.academy.fitness.domain.dto.UserRegistrationDTO;
 import by.academy.fitness.domain.entity.Audit;
 import by.academy.fitness.domain.entity.Audit.ESSENCETYPE;
 import by.academy.fitness.domain.entity.User;
 import by.academy.fitness.domain.entity.User.USERSTATUS;
 import by.academy.fitness.domain.entity.VerificationToken;
+import by.academy.fitness.domain.mapper.impl.UserMapper;
 import by.academy.fitness.domain.validators.SaveUserValidaror;
 import by.academy.fitness.exceptions.ValidationException;
 import by.academy.fitness.security.filters.CryptoUtil;
@@ -33,15 +33,18 @@ public class VerificationService implements IVerificationService {
 	private final VerificationDao verificationDao;
 	private final AuditService auditService;
 	private final SaveUserValidaror validator;
+	private final UserMapper mapper;
 
 	@Autowired
 	public VerificationService(IUserService userService, EmailServiceImpl mailServiceImpl,
-			VerificationDao verificationDao, AuditService auditService, SaveUserValidaror validator) {
+			VerificationDao verificationDao, AuditService auditService, SaveUserValidaror validator,
+			UserMapper mapper) {
 		this.userService = userService;
 		this.mailServiceImpl = mailServiceImpl;
 		this.verificationDao = verificationDao;
 		this.auditService = auditService;
 		this.validator = validator;
+		this.mapper = mapper;
 	}
 
 	@Override
@@ -76,7 +79,7 @@ public class VerificationService implements IVerificationService {
 		if (parts.length != 2) {
 			throw new ValidationException("Invalid token");
 		}
-		User user = userService.findByEmail(parts[1]);
+		UserDTO user = userService.findByEmail(parts[1]);
 		if (user == null) {
 			throw new ValidationException("User not found");
 		}
@@ -86,35 +89,35 @@ public class VerificationService implements IVerificationService {
 		}
 		if (t.getUser().equals(user)) {
 			user.setStatus(USERSTATUS.ACTIVATED);
-			userService.updateStatus(user.getUuid(), user.getStatus(), user.getDtUpdate());
+			userService.update(user.getId(), user.getDtUpdate(), user);
 			return true;
 
 		}
-		auditService.create(new Audit(CONFIRM, ESSENCETYPE.USER, user.getUsername()), user);
+		auditService.create(new Audit(CONFIRM, ESSENCETYPE.USER, user.getUsername()), mapper.toEntity(user));
 		return false;
 	}
 
 	@Transactional
 	@Override
-	public User registration(UserRegistrationDTO dto) {
+	public UserDTO registration(UserDTO dto) {
 		return userService.create(dto);
 	}
 
 	@Transactional
 	@Override
-	public User waitingActivation(UserDTO dto) {
+	public UserDTO waitingActivation(UserDTO dto) {
 		validator.validate(dto);
-		User user = userService.findByEmail(dto.getEmail());
+		UserDTO user = userService.findByEmail(dto.getEmail());
 		VerificationToken token = new VerificationToken();
 		token.setDtCreate(LocalDateTime.now());
 		token.setUuid(UUID.randomUUID());
 		String encodedToken = CryptoUtil.encrypt("VerificationToken",
 				token.getUuid().toString() + "|" + dto.getEmail());
-		token.setUser(user);
+		token.setUser(new User(user.getId()));
 		token.setToken(UriUtils.encode(encodedToken, "UTF-8"));
 		verificationDao.create(token);
 		sendMessage(dto.getEmail(), token.getToken());
-		auditService.create(new Audit(ACTIVATED, ESSENCETYPE.USER, user.getUsername()), user);
+		auditService.create(new Audit(ACTIVATED, ESSENCETYPE.USER, user.getUsername()), mapper.toEntity(user));
 
 		return userService.findByEmail(dto.getEmail());
 	}

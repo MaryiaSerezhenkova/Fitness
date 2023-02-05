@@ -19,12 +19,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import by.academy.fitness.domain.builders.UserMapper;
 import by.academy.fitness.domain.dto.PaginationContextDTO;
 import by.academy.fitness.domain.dto.UserDTO;
-import by.academy.fitness.domain.dto.UserRegistrationDTO;
 import by.academy.fitness.domain.entity.Page;
-import by.academy.fitness.domain.entity.User;
 import by.academy.fitness.service.UserService;
 
 @RestController
@@ -39,41 +36,39 @@ public class UserController {
 	}
 
 	@GetMapping(value = "/{uuid}")
-	protected ResponseEntity<User> get(@PathVariable UUID uuid) {
+	protected ResponseEntity<UserDTO> get(@PathVariable UUID uuid) {
 		return ResponseEntity.ok(userService.read(uuid));
 	}
 
-
 	@GetMapping("/me")
 	public ResponseEntity<UserDTO> me() {
-		User user = userService.findByEmail(SecurityContextHolder.getContext().getAuthentication().getName());
-		UserDTO dto = UserMapper.dto(user);
-		return new ResponseEntity<>(dto, HttpStatus.OK);
+		return new ResponseEntity<>(
+				userService.findByEmail(SecurityContextHolder.getContext().getAuthentication().getName()),
+				HttpStatus.OK);
 	}
 
 	@PutMapping(value = "/{uuid}/dtUpdate/{dt_update}")
-	protected ResponseEntity<User> doPut(@PathVariable UUID uuid, @PathVariable("dt_update") long dtUpdateRow,
-			@RequestBody UserRegistrationDTO data) {
-		LocalDateTime dtUpdate = LocalDateTime.ofInstant(Instant.ofEpochMilli(dtUpdateRow), ZoneId.systemDefault());
-		return ResponseEntity.ok(this.userService.update(uuid, dtUpdate, data));
+	protected ResponseEntity<UserDTO> doPut(@PathVariable UUID uuid, @PathVariable("dt_update") long dtUpdateRow,
+			@RequestBody UserDTO data) {
+		return ResponseEntity.ok(userService.update(uuid,
+				LocalDateTime.ofInstant(Instant.ofEpochMilli(dtUpdateRow), ZoneId.systemDefault()), data));
 	}
 
 	@DeleteMapping(value = "/{uuid}/dtUpdate/{dt_update}")
 	protected ResponseEntity<?> doDelete(@PathVariable UUID uuid, @PathVariable("dt_update") long dtUpdateRow,
-			@RequestBody UserRegistrationDTO data) {
-		LocalDateTime dtUpdate = LocalDateTime.ofInstant(Instant.ofEpochMilli(dtUpdateRow), ZoneId.systemDefault());
-		userService.delete(uuid, dtUpdate);
+			@RequestBody UserDTO data) {
+		userService.delete(uuid, LocalDateTime.ofInstant(Instant.ofEpochMilli(dtUpdateRow), ZoneId.systemDefault()));
 		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 	}
 
 	@PostMapping(value = "/pagination")
-	protected ResponseEntity<Page<User>> getList(@RequestBody PaginationContextDTO paging) {
-		Page<User> page = userService.get(paging.getAmount(), paging.getSkip(), paging.getSortings(),
-				paging.getFilters());
-		return ResponseEntity.ok(page);
+	protected ResponseEntity<Page<UserDTO>> getList(@RequestBody PaginationContextDTO paging) {
+		return ResponseEntity
+				.ok(userService.get(paging.getAmount(), paging.getSkip(), paging.getSortings(), paging.getFilters()));
 	}
+
 	@GetMapping
-	public ResponseEntity<Page<User>> getList(@RequestParam int page, @RequestParam int size) {
+	public ResponseEntity<Page<UserDTO>> getList(@RequestParam int page, @RequestParam int size) {
 		return new ResponseEntity<>(userService.get(size, page * size, null, null), HttpStatus.OK);
 	}
 }
