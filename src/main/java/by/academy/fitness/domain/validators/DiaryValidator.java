@@ -25,7 +25,7 @@ public class DiaryValidator implements IValidator<DiaryDTO>  {
 		if (dto.getWeight()<=0) {
 			errors.add("Weight is not valid");
 		}
-		if (dto.getDishUuid()==null & dto.getProductUuid()==null) {
+		if (dto.getProduct()==null && dto.getDish()==null) {
 			errors.add("Both parametres are empty");
 		}
 		

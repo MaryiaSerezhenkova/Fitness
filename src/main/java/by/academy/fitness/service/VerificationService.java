@@ -15,7 +15,6 @@ import by.academy.fitness.domain.entity.Audit.ESSENCETYPE;
 import by.academy.fitness.domain.entity.User;
 import by.academy.fitness.domain.entity.User.USERSTATUS;
 import by.academy.fitness.domain.entity.VerificationToken;
-import by.academy.fitness.domain.mapper.impl.UserMapper;
 import by.academy.fitness.domain.validators.SaveUserValidaror;
 import by.academy.fitness.exceptions.ValidationException;
 import by.academy.fitness.security.filters.CryptoUtil;
@@ -33,18 +32,15 @@ public class VerificationService implements IVerificationService {
 	private final VerificationDao verificationDao;
 	private final AuditService auditService;
 	private final SaveUserValidaror validator;
-	private final UserMapper mapper;
 
 	@Autowired
 	public VerificationService(IUserService userService, EmailServiceImpl mailServiceImpl,
-			VerificationDao verificationDao, AuditService auditService, SaveUserValidaror validator,
-			UserMapper mapper) {
+			VerificationDao verificationDao, AuditService auditService, SaveUserValidaror validator) {
 		this.userService = userService;
 		this.mailServiceImpl = mailServiceImpl;
 		this.verificationDao = verificationDao;
 		this.auditService = auditService;
 		this.validator = validator;
-		this.mapper = mapper;
 	}
 
 	@Override
@@ -79,21 +75,21 @@ public class VerificationService implements IVerificationService {
 		if (parts.length != 2) {
 			throw new ValidationException("Invalid token");
 		}
-		UserDTO user = userService.findByEmail(parts[1]);
-		if (user == null) {
+		UserDTO userDto = userService.findByEmail(parts[1]);
+		if (userDto == null) {
 			throw new ValidationException("User not found");
 		}
 		VerificationToken t = verificationDao.findByUuid(UUID.fromString(parts[0]));
 		if (token == null) {
 			throw new ValidationException("User not found");
 		}
-		if (t.getUser().equals(user)) {
-			user.setStatus(USERSTATUS.ACTIVATED);
-			userService.update(user.getId(), user.getDtUpdate(), user);
+		if (t.getUser().equals(userDto)) {
+			userDto.setStatus(USERSTATUS.ACTIVATED);
+			userService.update(userDto.getUuid(), userDto.getDtUpdate(), userDto);
 			return true;
 
 		}
-		auditService.create(new Audit(CONFIRM, ESSENCETYPE.USER, user.getUsername()), mapper.toEntity(user));
+		auditService.create(new Audit(CONFIRM, ESSENCETYPE.USER, userDto.getUsername()), userDto.getUuid());
 		return false;
 	}
 
@@ -107,17 +103,17 @@ public class VerificationService implements IVerificationService {
 	@Override
 	public UserDTO waitingActivation(UserDTO dto) {
 		validator.validate(dto);
-		UserDTO user = userService.findByEmail(dto.getEmail());
+		UserDTO userDto = userService.findByEmail(dto.getEmail());
 		VerificationToken token = new VerificationToken();
 		token.setDtCreate(LocalDateTime.now());
 		token.setUuid(UUID.randomUUID());
 		String encodedToken = CryptoUtil.encrypt("VerificationToken",
 				token.getUuid().toString() + "|" + dto.getEmail());
-		token.setUser(new User(user.getId()));
+		token.setUser(new User(userDto.getUuid()));
 		token.setToken(UriUtils.encode(encodedToken, "UTF-8"));
 		verificationDao.create(token);
 		sendMessage(dto.getEmail(), token.getToken());
-		auditService.create(new Audit(ACTIVATED, ESSENCETYPE.USER, user.getUsername()), mapper.toEntity(user));
+		auditService.create(new Audit(ACTIVATED, ESSENCETYPE.USER, userDto.getUsername()), userDto.getUuid());
 
 		return userService.findByEmail(dto.getEmail());
 	}

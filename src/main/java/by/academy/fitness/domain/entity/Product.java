@@ -3,6 +3,7 @@ package by.academy.fitness.domain.entity;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -59,10 +60,11 @@ public class Product implements IEntity {
 	private double fats;
 	@Column
 	private double carbohydrates;
-	@ManyToOne
-	//(fetch = FetchType.LAZY)
-	@JoinColumn(name = "user_uuid", referencedColumnName = "uuid")
+	@ManyToOne(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
+	@JoinColumn(name = "user_uuid", referencedColumnName = "uuid", insertable=false, updatable=false)
 	private User user;
+	@Column(name = "user_uuid")
+	private UUID userId;
 
 	public Product() {
 		super();
@@ -186,6 +188,14 @@ public class Product implements IEntity {
 
 	public void setUser(User user) {
 		this.user = user;
+	}
+
+	public UUID getUserId() {
+		return userId;
+	}
+
+	public void setUserId(UUID userId) {
+		this.userId = userId;
 	}
 
 	@Override

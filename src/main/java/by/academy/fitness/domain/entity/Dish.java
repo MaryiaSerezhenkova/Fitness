@@ -43,10 +43,21 @@ public class Dish implements IEntity {
 	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
 	@JoinColumn(name = "dish_uuid", referencedColumnName = "uuid")
 	private List<Ingredient> ingredients;
-	@ManyToOne
-	//(fetch = FetchType.LAZY)
-	@JoinColumn(name = "user_uuid", referencedColumnName = "uuid")
+	@ManyToOne(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
+	@JoinColumn(name = "user_uuid", referencedColumnName = "uuid", insertable=false, updatable=false)
 	private User user;
+	@Column(name = "user_uuid")
+	private UUID userId;
+	
+	
+
+	public UUID getUserId() {
+		return userId;
+	}
+
+	public void setUserId(UUID userId) {
+		this.userId = userId;
+	}
 
 	public Dish() {
 		super();

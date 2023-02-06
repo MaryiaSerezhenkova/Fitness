@@ -13,8 +13,16 @@ import by.academy.fitness.config.CustomLocalDateTimeSerializer;
 import by.academy.fitness.domain.entity.Product.UNIT;
 
 public class ProductDTO {
-//	@JsonProperty(access = Access.READ_ONLY)
-	private UUID id;
+	@JsonProperty(access = Access.READ_ONLY)
+	private UUID uuid;
+	@JsonProperty(access = Access.READ_ONLY)
+	@JsonSerialize(using = CustomLocalDateTimeSerializer.class)
+	@JsonDeserialize(using = CustomLocalDateTimeDesSerializer.class)
+	private LocalDateTime dtCreate;
+    @JsonProperty(access = Access.READ_ONLY)
+	@JsonSerialize(using = CustomLocalDateTimeSerializer.class)
+	@JsonDeserialize(using = CustomLocalDateTimeDesSerializer.class)
+	private LocalDateTime dtUpdate;
 	private String name;
 	private int weight;
 	private UNIT unit;
@@ -22,17 +30,9 @@ public class ProductDTO {
 	private double proteins;
 	private double fats;
 	private double carbohydrates;
-//	@JsonProperty(access = Access.READ_ONLY)
+	@JsonProperty(access = Access.READ_ONLY)
 	private UserShortViewDTO user;
-//	@JsonProperty(access = Access.READ_ONLY)
-	@JsonSerialize(using = CustomLocalDateTimeSerializer.class)
-	@JsonDeserialize(using = CustomLocalDateTimeDesSerializer.class)
-	private LocalDateTime dtCreate;
-//JsonProperty(access = Access.READ_ONLY)
-	@JsonSerialize(using = CustomLocalDateTimeSerializer.class)
-	@JsonDeserialize(using = CustomLocalDateTimeDesSerializer.class)
-	private LocalDateTime dtUpdate;
-
+	
 	public ProductDTO() {
 		super();
 	}
@@ -103,6 +103,38 @@ public class ProductDTO {
 
 	public void setCarbohydrates(double carbohydrates) {
 		this.carbohydrates = carbohydrates;
+	}
+
+	public UUID getUuid() {
+		return uuid;
+	}
+
+	public void setUuid(UUID uuid) {
+		this.uuid = uuid;
+	}
+
+	public UserShortViewDTO getUser() {
+		return user;
+	}
+
+	public void setUser(UserShortViewDTO user) {
+		this.user = user;
+	}
+
+	public LocalDateTime getDtCreate() {
+		return dtCreate;
+	}
+
+	public void setDtCreate(LocalDateTime dtCreate) {
+		this.dtCreate = dtCreate;
+	}
+
+	public LocalDateTime getDtUpdate() {
+		return dtUpdate;
+	}
+
+	public void setDtUpdate(LocalDateTime dtUpdate) {
+		this.dtUpdate = dtUpdate;
 	}
 
 	@Override

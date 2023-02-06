@@ -4,8 +4,8 @@ import java.util.UUID;
 
 public class IngredientDTO {
 
-	private UUID productUuid;
-	
+	private UUID uuid;
+	private ProductDTO product;
 
 	private int weight;
 
@@ -13,18 +13,27 @@ public class IngredientDTO {
 		super();
 	}
 
-	public IngredientDTO(UUID productUuid, int weight) {
+	public IngredientDTO(UUID uuid, ProductDTO product, int weight) {
 		super();
-		this.productUuid = productUuid;
+		this.uuid = uuid;
+		this.product = product;
 		this.weight = weight;
 	}
 
-	public UUID getProductUuid() {
-		return productUuid;
+	public UUID getUuid() {
+		return uuid;
 	}
 
-	public void setProductUuid(UUID productUuid) {
-		this.productUuid = productUuid;
+	public void setUuid(UUID uuid) {
+		this.uuid = uuid;
+	}
+
+	public ProductDTO getProduct() {
+		return product;
+	}
+
+	public void setProduct(ProductDTO product) {
+		this.product = product;
 	}
 
 	public int getWeight() {
@@ -34,5 +43,7 @@ public class IngredientDTO {
 	public void setWeight(int weight) {
 		this.weight = weight;
 	}
+
+	
 
 }

@@ -48,14 +48,14 @@ public class ProfileService implements IProfileService {
 	@Transactional
 	@Override
 	public ProfileDTO create(ProfileDTO dto) {
-		UserDTO user = userService.findByEmail(SecurityContextHolder.getContext().getAuthentication().getName());
+		UserDTO userDto = userService.findByUsername(SecurityContextHolder.getContext().getAuthentication().getName());
 		Profile profile = mapper.toEntity(dto);
 		profile.setUuid(UUID.randomUUID());
 		profile.setDtCreate(LocalDateTime.now().truncatedTo(ChronoUnit.MILLIS));
 		profile.setDtUpdate(profile.getDtCreate());
-		profile.setUser(new User(user.getId()));
+		profile.setUserId(userDto.getUuid());
 		auditService.create(new Audit(CREATED, ESSENCETYPE.PROFILE, profile.getUuid().toString()),
-				new User(user.getId()));
+				userDto.getUuid());
 		return mapper.toDTO(profileDao.create(profile));
 	}
 
@@ -75,13 +75,13 @@ public class ProfileService implements IProfileService {
 	@Transactional
 	@Override
 	public ProfileDTO update(UUID uuid, LocalDateTime dtUpdate, ProfileDTO dto) {
-		UserDTO user = userService.findByEmail(SecurityContextHolder.getContext().getAuthentication().getName());
+		UserDTO userDto = userService.findByUsername(SecurityContextHolder.getContext().getAuthentication().getName());
 		Profile readed = profileDao.findByUuid(uuid);
 
 		if (readed == null) {
 			throw new IllegalArgumentException("Item not found");
 		}
-		if (!readed.getUser().equals(user)) {
+		if (!readed.getUser().equals(userDto)) {
 			throw new IllegalArgumentException("You can only update the profile you created");
 		}
 
@@ -95,22 +95,22 @@ public class ProfileService implements IProfileService {
 		readed.setTarget(dto.getTarget());
 		readed.setType(dto.getType());
 		readed.setGender(dto.getGender());
-		readed.setUser(new User(user.getId()));
+		readed.setUser(new User(userDto.getUuid()));
 		auditService.create(new Audit(UPDATED, ESSENCETYPE.PROFILE, readed.getUuid().toString()),
-				new User(user.getId()));
+				userDto.getUuid());
 		return mapper.toDTO(profileDao.create(readed));
 	}
 
 	@Transactional
 	@Override
 	public void delete(UUID uuid, LocalDateTime dtUpdate) {
-		UserDTO user = userService.findByEmail(SecurityContextHolder.getContext().getAuthentication().getName());
+		UserDTO userDto = userService.findByUsername(SecurityContextHolder.getContext().getAuthentication().getName());
 		ProfileDTO profile = mapper.toDTO(profileDao.findByUuid(uuid));
 
 		if (profile == null) {
 			throw new IllegalArgumentException("Item not found");
 		}
-		if (!profile.getUser().equals(user)) {
+		if (!profile.getUser().equals(userDto)) {
 			throw new IllegalArgumentException("You can only update the profile you created");
 		}
 
@@ -118,7 +118,7 @@ public class ProfileService implements IProfileService {
 			throw new IllegalArgumentException("Sorry, this item has already been edited");
 		}
 		auditService.create(new Audit(DELETED, ESSENCETYPE.PROFILE, profile.getId().toString()),
-				new User(user.getId()));
+				userDto.getUuid());
 		profileDao.delete(uuid, dtUpdate);
 	}
 

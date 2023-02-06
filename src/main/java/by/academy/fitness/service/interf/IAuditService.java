@@ -8,11 +8,10 @@ import by.academy.fitness.dao.Sorting;
 import by.academy.fitness.domain.dto.AuditDTO;
 import by.academy.fitness.domain.entity.Audit;
 import by.academy.fitness.domain.entity.Page;
-import by.academy.fitness.domain.entity.User;
 
 public interface IAuditService {
 
-	AuditDTO create(Audit audit, User user);
+	AuditDTO create(Audit type, UUID userId);
 
 	AuditDTO read(UUID uuid);
 

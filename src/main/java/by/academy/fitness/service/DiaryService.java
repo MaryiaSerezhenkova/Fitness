@@ -56,25 +56,25 @@ public class DiaryService implements IDiaryService {
 	@Transactional
 	@Override
 	public DiaryDTO create(DiaryDTO dto) {
-		UserDTO user = userService.findByEmail(SecurityContextHolder.getContext().getAuthentication().getName());
+		UserDTO userDto = userService.findByUsername(SecurityContextHolder.getContext().getAuthentication().getName());
 		validator.validate(dto);
 		Diary diary = mapper.toEntity(dto);
 
-		ProfileDTO profile = profileService.findByUserId(user.getId());
+		ProfileDTO profile = profileService.findByUserId(userDto.getUuid());
 		diary.setUuid(UUID.randomUUID());
 
 		diary.setDtCreate(LocalDateTime.now());
 		diary.setDtUpdate(diary.getDtCreate());
-		if (dto.getDishUuid() != null) {
-			diary.setDish(new Dish(dto.getDishUuid()));
+		if (dto.getDish() != null) {
+			diary.setDishId(dto.getDish().getUuid());
 		}
-		if (dto.getProductUuid() != null) {
-			diary.setProduct(new Product(dto.getProductUuid()));
+		if (dto.getProduct() != null) {
+			diary.setProductId(dto.getProduct().getUuid());
 		}
 		diary.setWeight(dto.getWeight());
 		diary.setMealTime(dto.getMealTime());
 		diary.setProfile(new Profile(profile.getId()));
-		auditService.create(new Audit(CREATED, ESSENCETYPE.DIARY, diary.getUuid().toString()), new User(user.getId()));
+		auditService.create(new Audit(CREATED, ESSENCETYPE.DIARY, diary.getUuid().toString()), userDto.getUuid());
 		return mapper.toDTO(diaryDao.create(diary));
 	}
 
@@ -114,13 +114,13 @@ public class DiaryService implements IDiaryService {
 	@Transactional
 	@Override
 	public DiaryDTO update(UUID uuid, LocalDateTime dtUpdate, DiaryDTO dto) {
-		UserDTO user = userService.findByEmail(SecurityContextHolder.getContext().getAuthentication().getName());
+		UserDTO userDto = userService.findByUsername(SecurityContextHolder.getContext().getAuthentication().getName());
 		Diary readed = diaryDao.findByUuid(uuid);
 
 		if (readed == null) {
 			throw new IllegalArgumentException("Item not found");
 		}
-		if (!readed.getProfile().getUser().equals(user)) {
+		if (!readed.getProfile().getUser().equals(userDto)) {
 			throw new IllegalArgumentException("You can only update the product you created");
 		}
 
@@ -130,14 +130,14 @@ public class DiaryService implements IDiaryService {
 		validator.validate(dto);
 		readed.setDtUpdate(LocalDateTime.now());
 		readed.setWeight(dto.getWeight());
-		if (dto.getProductUuid() != null) {
-			readed.setProduct(new Product(dto.getProductUuid()));
-		}
-		if (dto.getDishUuid() != null) {
-			readed.setDish(new Dish(dto.getDishUuid()));
-		}
+//		if (dto.getProductUuid() != null) {
+//			readed.setProduct(new Product(dto.getProductUuid()));
+//		}
+//		if (dto.getDishUuid() != null) {
+//			readed.setDish(new Dish(dto.getDishUuid()));
+//		}
 		readed.setMealTime(dto.getMealTime());
-		auditService.create(new Audit(UPDATED, ESSENCETYPE.DIARY, readed.getUuid().toString()), new User(user.getId()));
+		auditService.create(new Audit(UPDATED, ESSENCETYPE.DIARY, readed.getUuid().toString()), userDto.getUuid());
 
 		return mapper.toDTO(diaryDao.create(readed));
 	}
@@ -145,9 +145,9 @@ public class DiaryService implements IDiaryService {
 	@Transactional
 	@Override
 	public void delete(UUID uuid, LocalDateTime dtUpdate) {
-		UserDTO user = userService.findByEmail(SecurityContextHolder.getContext().getAuthentication().getName());
+		UserDTO userDto = userService.findByUsername(SecurityContextHolder.getContext().getAuthentication().getName());
 		auditService.create(new Audit(DELETED, ESSENCETYPE.DIARY, diaryDao.findByUuid(uuid).getUuid().toString()),
-				new User(user.getId()));
+				userDto.getUuid());
 		diaryDao.delete(uuid, dtUpdate);
 
 	}

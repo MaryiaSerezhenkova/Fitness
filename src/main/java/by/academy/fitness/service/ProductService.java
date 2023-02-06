@@ -39,36 +39,34 @@ public class ProductService implements IProductService {
 	private final UserService userService;
 	private final AuditService auditService;
 	private final BaseMapper<Product, ProductDTO> mapper;
-	private final UserMapper userMapper;
 
 	@Autowired
 	public ProductService(ProductDao productDao, ProductValidator validator, UserService userService,
-			AuditService auditService, ProductMapper mapper, UserMapper userMapper) {
+			AuditService auditService, ProductMapper mapper) {
 		super();
 		this.productDao = productDao;
 		this.validator = validator;
 		this.userService = userService;
 		this.auditService = auditService;
 		this.mapper = mapper;
-		this.userMapper=userMapper;
 	}
 
 	@Transactional
 	@Override
 	public ProductDTO create(ProductDTO dto) {
-		//UserDTO user = userService.findByEmail(SecurityContextHolder.getContext().getAuthentication().getName());
-		UserDTO user = userService.findByUsername(SecurityContextHolder.getContext().getAuthentication().getName());
+		UserDTO userDto = userService.findByUsername(SecurityContextHolder.getContext().getAuthentication().getName());
 		validator.validate(dto);
 		Product product = mapper.toEntity(dto);
 		product.setUuid(UUID.randomUUID());
 		product.setDtCreate(LocalDateTime.now().truncatedTo(ChronoUnit.MILLIS));
 		product.setDtUpdate(product.getDtCreate());
-		product.setUser(new User(user.getId()));
-//		auditService.create(new Audit(CREATED, ESSENCETYPE.PRODUCT, product.getName() + " " + product.getUuid()),
-//				user1);
+		product.setUserId(userDto.getUuid());
+		auditService.create(new Audit(CREATED, ESSENCETYPE.PRODUCT, product.getName() + " " + product.getUuid()),
+				userDto.getUuid());
 		return mapper.toDTO(productDao.create(product));
 	}
 
+	
 	@Transactional
 	@Override
 	public ProductDTO read(UUID uuid) {
@@ -106,13 +104,13 @@ public class ProductService implements IProductService {
 	@Transactional
 	@Override
 	public ProductDTO update(UUID uuid, LocalDateTime dtUpdate, ProductDTO dto) {
-		UserDTO user = userService.findByUsername(SecurityContextHolder.getContext().getAuthentication().getName());
+		UserDTO userDto = userService.findByUsername(SecurityContextHolder.getContext().getAuthentication().getName());
 		Product readed = productDao.findByUuid(uuid);
 
 		if (readed == null) {
 			throw new IllegalArgumentException("Item not found");
 		}
-		if (!readed.getUser().equals(user)) {
+		if (!readed.getUserId().equals(userDto.getUuid())) {
 			throw new IllegalArgumentException("You can only update the product you created");
 		}
 
@@ -128,21 +126,21 @@ public class ProductService implements IProductService {
 		readed.setProteins(dto.getProteins());
 		readed.setFats(dto.getFats());
 		readed.setCarbohydrates(dto.getCarbohydrates());
-		readed.setUser(new User(user.getId()));
-		auditService.create(new Audit(UPDATED, ESSENCETYPE.PRODUCT, readed.getName()), new User(user.getId()));
+		readed.setUserId(userDto.getUuid());
+		auditService.create(new Audit(UPDATED, ESSENCETYPE.PRODUCT, readed.getName()),userDto.getUuid());
 		return mapper.toDTO(productDao.create(readed));
 	}
 
 	@Transactional
 	@Override
 	public void delete(UUID uuid, LocalDateTime dtUpdate) {
-		UserDTO user = userService.findByUsername(SecurityContextHolder.getContext().getAuthentication().getName());
+		UserDTO userDto = userService.findByUsername(SecurityContextHolder.getContext().getAuthentication().getName());
 		Product readed = productDao.findByUuid(uuid);
 		if (readed == null) {
 			throw new IllegalArgumentException("Item not found");
 		}
 
-		if (!readed.getUser().equals(user)) {
+		if (!readed.getUser().equals(userDto)) {
 			throw new IllegalArgumentException("You can only delete the product you created");
 		}
 
@@ -150,7 +148,7 @@ public class ProductService implements IProductService {
 			throw new IllegalArgumentException("Sorry, this item has already been edited");
 		}
 
-		auditService.create(new Audit(DELETED, ESSENCETYPE.PRODUCT, uuid.toString()), new User(user.getId()));
+		auditService.create(new Audit(DELETED, ESSENCETYPE.PRODUCT, uuid.toString()), userDto.getUuid());
 		productDao.delete(uuid, dtUpdate);
 
 	}

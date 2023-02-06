@@ -20,14 +20,24 @@ public class Ingredient implements IEntity {
 	@Id
 	private UUID uuid;
 	@ManyToOne
-	@JoinColumn(name = "product_uuid", referencedColumnName = "uuid")
+	@JoinColumn(name = "product_uuid", referencedColumnName = "uuid", insertable=false, updatable=false)
 	private Product product;
 	@Column
 	private int weight;
+	@Column(name = "product_uuid")
+	private UUID productId;
 	
 
 	public Ingredient() {
 		super();
+	}
+
+	public UUID getProductId() {
+		return productId;
+	}
+
+	public void setProductId(UUID productId) {
+		this.productId = productId;
 	}
 
 	public Ingredient(UUID uuid, Product product, int weight) {

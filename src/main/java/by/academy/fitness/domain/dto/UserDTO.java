@@ -18,7 +18,7 @@ import by.academy.fitness.domain.entity.User.USERSTATUS;
 public class UserDTO {
 
 	@JsonProperty(access = Access.READ_ONLY)
-	private UUID id;
+	private UUID uuid;
 	private String email;
 	private String username;
 	private Set<Role> roles = new HashSet<>();
@@ -46,13 +46,14 @@ public class UserDTO {
 		this.password = password;
 	}
 
-	public UUID getId() {
-		return id;
+	public UUID getUuid() {
+		return uuid;
 	}
 
-	public void setId(UUID id) {
-		this.id = id;
+	public void setUuid(UUID uuid) {
+		this.uuid = uuid;
 	}
+
 
 	public LocalDateTime getDtCreate() {
 		return dtCreate;

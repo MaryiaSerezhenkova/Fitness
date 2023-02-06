@@ -3,12 +3,15 @@ package by.academy.fitness.domain.entity;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Version;
@@ -62,10 +65,22 @@ public class Profile implements IEntity {
 	@Enumerated(EnumType.STRING)
 	private GENDER gender;
 
-	@OneToOne
-	@JoinColumn(name = "user_uuid", referencedColumnName = "uuid")
+	@OneToOne(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
+	@JoinColumn(name = "user_uuid", referencedColumnName = "uuid", insertable=false, updatable=false)
 	private User user;
+	@Column(name = "user_uuid")
+	private UUID userId;
 
+	
+	public UUID getUserId() {
+		return userId;
+	}
+
+	public void setUserId(UUID userId) {
+		this.userId = userId;
+	}
+
+	
 	public Profile() {
 		super();
 	}

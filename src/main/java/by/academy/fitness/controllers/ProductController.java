@@ -35,9 +35,8 @@ public class ProductController {
 	}
 
 	@GetMapping(value = "/{uuid}")
-	protected ResponseEntity<Product> get(@PathVariable UUID uuid) {
-		//return ResponseEntity.ok(productService.read(uuid));
-		return ResponseEntity.ok(productService.readAll(uuid));
+	protected ResponseEntity<ProductDTO> get(@PathVariable UUID uuid) {
+		return ResponseEntity.ok(productService.read(uuid));
 	}
 
 	@GetMapping

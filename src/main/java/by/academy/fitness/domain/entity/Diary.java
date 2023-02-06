@@ -39,10 +39,10 @@ public class Diary implements IEntity {
 	@JsonDeserialize(using = CustomLocalDateTimeDesSerializer.class)
 	private LocalDateTime dtUpdate;
 	@ManyToOne(optional = true)
-	@JoinColumn(name = "product_uuid", nullable = true, referencedColumnName = "uuid")
+	@JoinColumn(name = "product_uuid", nullable = true, referencedColumnName = "uuid",insertable=false, updatable=false)
 	private Product product;
 	@ManyToOne(optional = true)
-	@JoinColumn(name = "dish_uuid", nullable = true, referencedColumnName = "uuid")
+	@JoinColumn(name = "dish_uuid", nullable = true, referencedColumnName = "uuid",insertable=false, updatable=false)
 	private Dish dish;
 	@Column
 	private int weight;
@@ -52,8 +52,32 @@ public class Diary implements IEntity {
 	private LocalDateTime mealTime;
 	@ManyToOne
 	//(fetch=FetchType.LAZY)
-	@JoinColumn(name = "profile_uuid", referencedColumnName = "uuid")
+	@JoinColumn(name = "profile_uuid", referencedColumnName = "uuid",insertable=false, updatable=false)
 	private Profile profile;
+	@Column(name = "profile_uuid")
+	private UUID profileId;
+	@Column(name = "dish_uuid")
+	private UUID dishId;
+	@Column(name = "product_uuid")
+	private UUID productId;
+
+
+
+	public UUID getDishId() {
+		return dishId;
+	}
+
+	public void setDishId(UUID dishId) {
+		this.dishId = dishId;
+	}
+
+	public UUID getProductId() {
+		return productId;
+	}
+
+	public void setProductId(UUID productId) {
+		this.productId = productId;
+	}
 
 	public Diary() {
 		super();
@@ -133,6 +157,14 @@ public class Diary implements IEntity {
 
 	public void setProfile(Profile profile) {
 		this.profile = profile;
+	}
+
+	public UUID getProfileId() {
+		return profileId;
+	}
+
+	public void setProfileId(UUID profileId) {
+		this.profileId = profileId;
 	}
 
 	@Override

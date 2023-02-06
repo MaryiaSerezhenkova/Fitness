@@ -31,11 +31,11 @@ public class AuditService implements IAuditService {
 	}
 
 	@Override
-	public AuditDTO create(Audit type, User user) {
+	public AuditDTO create(Audit type, UUID userId) {
 		Audit audit = new Audit();
 		audit.setUuid(UUID.randomUUID());
 		audit.setDtCreate(LocalDateTime.now().truncatedTo(ChronoUnit.MILLIS));
-		audit.setUser(user);
+		audit.setUserId(userId);
 		audit.setType(type.getType());
 		audit.setText(type.getText());
 		audit.setId(type.getId());

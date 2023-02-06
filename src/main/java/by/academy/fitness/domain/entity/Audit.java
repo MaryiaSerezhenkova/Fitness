@@ -3,10 +3,12 @@ package by.academy.fitness.domain.entity;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
@@ -32,9 +34,11 @@ public class Audit implements IEntity {
 	@JsonSerialize(using = CustomLocalDateTimeSerializer.class)
 	@JsonDeserialize(using = CustomLocalDateTimeDesSerializer.class)
 	private LocalDateTime dtCreate;
-	@ManyToOne
-	@JoinColumn(name = "user_uuid")
+	@ManyToOne(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
+	@JoinColumn(name = "user_uuid", referencedColumnName = "uuid", insertable=false, updatable=false)
 	private User user;
+	@Column(name = "user_uuid")
+	private UUID userId;
 	@Column
 	private String text;
 	@Column
@@ -109,6 +113,14 @@ public class Audit implements IEntity {
 	@Override
 	public UUID getUuid() {
 		return uuid;
+	}
+
+	public UUID getUserId() {
+		return userId;
+	}
+
+	public void setUserId(UUID userId) {
+		this.userId = userId;
 	}
 
 }

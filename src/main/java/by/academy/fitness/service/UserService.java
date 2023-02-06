@@ -65,7 +65,7 @@ public class UserService implements IUserService {
 		user.setRoles(Set.of(role));
 		user.setStatus(USERSTATUS.WAITING_ACTIVATION);
 		user.setPassword(encoder.encode(dto.getPassword()));
-		auditService.create(new Audit(WAITING_ACTIVATION, ESSENCETYPE.USER, user.getUsername()), user);
+		auditService.create(new Audit(WAITING_ACTIVATION, ESSENCETYPE.USER, user.getUsername()), user.getUuid());
 		return mapper.toDTO(userDao.create(user));
 	}
 
@@ -121,7 +121,7 @@ public class UserService implements IUserService {
 		readed.setEmail(dto.getEmail());
 		readed.setUsername(dto.getUsername());
 		readed.setPassword(dto.getPassword());
-		auditService.create(new Audit(UPDATED, ESSENCETYPE.USER, readed.getUsername()), readed);
+		auditService.create(new Audit(UPDATED, ESSENCETYPE.USER, readed.getUsername()), readed.getUuid());
 		return mapper.toDTO(userDao.create(readed));
 	}
 

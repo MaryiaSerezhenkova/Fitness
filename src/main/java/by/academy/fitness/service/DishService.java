@@ -40,45 +40,42 @@ public class DishService implements IDishService {
 	private final UserService userService;
 	private final AuditService auditService;
 	private final DishMapper mapper;
-	private final UserMapper userMapper;
 
 	@Autowired
 	public DishService(DishDao dishDao, ProductService productService, DishValidator validator, UserService userService,
-			AuditService auditService, DishMapper mapper, UserMapper userMapper) {
+			AuditService auditService, DishMapper mapper) {
 		super();
 		this.dishDao = dishDao;
 		this.validator = validator;
 		this.userService = userService;
 		this.auditService = auditService;
 		this.mapper = mapper;
-		this.userMapper=userMapper;
 	}
 
 	@Transactional
 	@Override
 	public DishDTO create(DishDTO dto) {
-		String email = SecurityContextHolder.getContext().getAuthentication().getName();
-		System.out.println(email);
-		UserDTO user = userService.findByEmail(SecurityContextHolder.getContext().getAuthentication().getName());
-		Dish dish = new Dish();
+		UserDTO userDto = userService.findByUsername(SecurityContextHolder.getContext().getAuthentication().getName());
+		//Dish dish = new Dish();
+		Dish dish = mapper.toEntity(dto);
 		validator.validate(dto);
 		dish.setUuid(UUID.randomUUID());
 		dish.setDtCreate(LocalDateTime.now());
 		dish.setDtUpdate(dish.getDtCreate());
-		dish.setName(dto.getName());
+	//	dish.setName(dto.getName());
 		List<Ingredient> ingr = new ArrayList<>();
 
 		for (IngredientDTO i : dto.getIngredients()) {
 			Ingredient x = new Ingredient();
 			x.setUuid(UUID.randomUUID());
-			x.setProduct(new Product(i.getProductUuid()));
+			x.setProductId(i.getProduct().getUuid());
 			x.setWeight(i.getWeight());
 			ingr.add(x);
 		}
 		dish.setIngredients(ingr);
-		dish.setUser(new User(user.getId()));
+		dish.setUserId(userDto.getUuid());;
 		auditService.create(new Audit(CREATED, ESSENCETYPE.DISH, dish.getName() + " " + dish.getUuid().toString()),
-				dish.getUser());
+				userDto.getUuid());
 
 		return mapper.toDTO(dishDao.create(dish));
 	}
@@ -91,13 +88,13 @@ public class DishService implements IDishService {
 	@Transactional
 	@Override
 	public DishDTO update(UUID uuid, LocalDateTime dtUpdate, DishDTO dto) {
-		UserDTO user = userService.findByEmail(SecurityContextHolder.getContext().getAuthentication().getName());
+		UserDTO userDto = userService.findByUsername(SecurityContextHolder.getContext().getAuthentication().getName());
 		Dish readed = dishDao.findByUuid(uuid);
 
 		if (readed == null) {
 			throw new IllegalArgumentException("Item not found");
 		}
-		if (!readed.getUser().equals(user)) {
+		if (!readed.getUser().equals(userDto)) {
 			throw new IllegalArgumentException("You can only update the product you created");
 		}
 
@@ -111,13 +108,13 @@ public class DishService implements IDishService {
 		for (IngredientDTO i : dto.getIngredients()) {
 			Ingredient x = new Ingredient();
 			x.setUuid(UUID.randomUUID());
-			x.setProduct(new Product(i.getProductUuid()));
+			x.setProductId(i.getProduct().getUuid());
 			x.setWeight(i.getWeight());
 			ingr.add(x);
 		}
 		readed.setIngredients(ingr);
 		auditService.create(new Audit(UPDATED, ESSENCETYPE.DISH, readed.getName() + " " + readed.getUuid().toString()),
-				userMapper.toEntity(user));
+				userDto.getUuid());
 
 		return mapper.toDTO(dishDao.create(readed));
 	}
@@ -125,11 +122,11 @@ public class DishService implements IDishService {
 	@Transactional
 	@Override
 	public void delete(UUID uuid, LocalDateTime dtUpdate) {
-		UserDTO user = userService.findByEmail(SecurityContextHolder.getContext().getAuthentication().getName());
-		if (!dishDao.findByUuid(uuid).getUser().equals(user)) {
+		UserDTO userDto = userService.findByUsername(SecurityContextHolder.getContext().getAuthentication().getName());
+		if (!dishDao.findByUuid(uuid).getUser().equals(userDto)) {
 			throw new IllegalArgumentException("You can only delete the product you created");
 		}
-		auditService.create(new Audit(DELETED, ESSENCETYPE.DISH, uuid.toString()), new User(user.getId()));
+		auditService.create(new Audit(DELETED, ESSENCETYPE.DISH, uuid.toString()), userDto.getUuid());
 		dishDao.delete(uuid, dtUpdate);
 
 	}
