@@ -44,7 +44,7 @@ public class ProfileDao extends BaseEntityDAO<UUID, Profile> implements IProfile
 		Root<Profile> root = criteria.from(getClazz());
 		criteria.select(root);
 
-		criteria.where(builder.equal(root.get("user"), userId));
+		criteria.where(builder.equal(root.get("userId"), userId));
 		return getEntityManager().createQuery(criteria).getResultList().stream().findFirst().orElse(null);
 	}
 
