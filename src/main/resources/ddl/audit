@@ -1,0 +1,23 @@
+-- Table: app.audit
+
+-- DROP TABLE IF EXISTS app.audit;
+
+CREATE TABLE IF NOT EXISTS app.audit
+(
+    uuid uuid NOT NULL,
+    dt_create timestamp(3) without time zone,
+    id character varying(255) COLLATE pg_catalog."default",
+    text character varying(255) COLLATE pg_catalog."default",
+    type character varying(255) COLLATE pg_catalog."default",
+    user_uuid uuid,
+    CONSTRAINT audit_pkey PRIMARY KEY (uuid),
+    CONSTRAINT fktyorc3m3by0krti95rifvxob FOREIGN KEY (user_uuid)
+        REFERENCES app.users (uuid) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION
+)
+
+TABLESPACE pg_default;
+
+ALTER TABLE IF EXISTS app.audit
+ 

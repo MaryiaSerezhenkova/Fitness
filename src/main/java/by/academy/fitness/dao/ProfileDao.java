@@ -11,7 +11,6 @@ import org.springframework.stereotype.Repository;
 
 import by.academy.fitness.dao.interf.IProfileDao;
 import by.academy.fitness.domain.entity.Profile;
-import by.academy.fitness.domain.entity.User;
 
 @Repository
 public class ProfileDao extends BaseEntityDAO<UUID, Profile> implements IProfileDao {
@@ -33,29 +32,19 @@ public class ProfileDao extends BaseEntityDAO<UUID, Profile> implements IProfile
 		return Profile.class;
 	}
 
+
 	@Override
-	public Profile findByUser(User user) {
+	public Boolean existsByUserId(UUID userId) {
+		return findByUserId(userId) != null;
+	}
+
+	public Profile findByUserId(UUID userId) {
 		CriteriaBuilder builder = getEntityManager().getCriteriaBuilder();
 		CriteriaQuery<Profile> criteria = builder.createQuery(getClazz());
 		Root<Profile> root = criteria.from(getClazz());
 		criteria.select(root);
 
-		criteria.where(builder.equal(root.get("user_uuid"), user.getUuid()));
-		return getEntityManager().createQuery(criteria).getResultList().stream().findFirst().orElse(null);
-	}
-
-	@Override
-	public Boolean existsByUser(User user) {
-		return findByUser(user) != null;
-	}
-
-	public Profile findByUserId(UUID id) {
-		CriteriaBuilder builder = getEntityManager().getCriteriaBuilder();
-		CriteriaQuery<Profile> criteria = builder.createQuery(getClazz());
-		Root<Profile> root = criteria.from(getClazz());
-		criteria.select(root);
-
-		criteria.where(builder.equal(root.get("user_uuid"), id));
+		criteria.where(builder.equal(root.get("user"), userId));
 		return getEntityManager().createQuery(criteria).getResultList().stream().findFirst().orElse(null);
 	}
 

@@ -20,7 +20,6 @@ import org.springframework.web.bind.annotation.RestController;
 import by.academy.fitness.domain.dto.PaginationContextDTO;
 import by.academy.fitness.domain.dto.ProductDTO;
 import by.academy.fitness.domain.entity.Page;
-import by.academy.fitness.domain.entity.Product;
 import by.academy.fitness.service.ProductService;
 
 @RestController

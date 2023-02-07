@@ -91,11 +91,15 @@ public class AuthController {
 
 		verificationService.registration(data);
 		return ResponseEntity
-				.ok(new MessageResponse("You registered successfully! Please check your email for verification link."));
+				.ok(new MessageResponse("Your registration request has been sent to the admin. Please check your email for verification link."));
 	}
 
 	@PostMapping
 	public ResponseEntity<?> addUser(@RequestBody UserDTO data) {
+		if (verificationService.findByUser(data) != null) {
+			return ResponseEntity.badRequest().body(new MessageResponse("Error: Email is already sent!"));
+		}
+
 		verificationService.waitingActivation(data);
 		return ResponseEntity.ok(new MessageResponse("User saved to database. Token sent to email"));
 	}

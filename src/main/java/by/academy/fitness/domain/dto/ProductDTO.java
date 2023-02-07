@@ -1,6 +1,7 @@
 package by.academy.fitness.domain.dto;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonProperty;

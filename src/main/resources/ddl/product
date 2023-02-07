@@ -1,0 +1,27 @@
+-- Table: app.product
+
+-- DROP TABLE IF EXISTS app.product;
+
+CREATE TABLE IF NOT EXISTS app.product
+(
+    uuid uuid NOT NULL,
+    dt_create timestamp(3) without time zone NOT NULL,
+    dt_update timestamp(3) without time zone NOT NULL,
+    name character varying COLLATE pg_catalog."default" NOT NULL,
+    weight bigint NOT NULL,
+    unit character varying COLLATE pg_catalog."default",
+    colories bigint,
+    proteins numeric(2,0),
+    fats numeric(2,0),
+    carbohydrates numeric(2,0),
+    user_uuid uuid,
+    CONSTRAINT product_pkey PRIMARY KEY (uuid),
+    CONSTRAINT fk32q7l1j2nekumgvoyjsund6l4 FOREIGN KEY (user_uuid)
+        REFERENCES app.users (uuid) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION
+)
+
+TABLESPACE pg_default;
+
+ALTER TABLE IF EXISTS app.product

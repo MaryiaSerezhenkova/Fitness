@@ -2,6 +2,7 @@ package by.academy.fitness.domain.entity;
 
 import java.time.LocalDateTime;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 
@@ -204,6 +205,26 @@ public class User implements IEntity {
 		builder.append(password);
 		builder.append("]");
 		return builder.toString();
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(dtCreate, dtUpdate, email, password, roles, status, username, uuid);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		User other = (User) obj;
+		return Objects.equals(dtCreate, other.dtCreate) && Objects.equals(dtUpdate, other.dtUpdate)
+				&& Objects.equals(email, other.email) && Objects.equals(password, other.password)
+				&& Objects.equals(roles, other.roles) && status == other.status
+				&& Objects.equals(username, other.username) && Objects.equals(uuid, other.uuid);
 	}
 
 }

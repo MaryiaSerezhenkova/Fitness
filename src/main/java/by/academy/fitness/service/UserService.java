@@ -23,7 +23,6 @@ import by.academy.fitness.domain.entity.User;
 import by.academy.fitness.domain.entity.User.ROLE;
 import by.academy.fitness.domain.entity.User.USERSTATUS;
 import by.academy.fitness.domain.mapper.impl.UserMapper;
-import by.academy.fitness.domain.mapper.impl.UserRegistrationMapper;
 import by.academy.fitness.domain.validators.UserValidator;
 import by.academy.fitness.service.interf.IUserService;
 
@@ -37,20 +36,17 @@ public class UserService implements IUserService {
 	private final UserValidator validator;
 	private final PasswordEncoder encoder;
 	private final AuditService auditService;
-
 	private final UserMapper mapper;
-	private final UserRegistrationMapper registrationMapper;
 
 	@Autowired
 	public UserService(UserDao userDao, RoleService roleService, UserValidator validator, PasswordEncoder encoder,
-			AuditService auditService, UserMapper mapper, UserRegistrationMapper registrationMapper) {
+			AuditService auditService, UserMapper mapper) {
 		this.userDao = userDao;
 		this.roleService = roleService;
 		this.validator = validator;
 		this.encoder = encoder;
 		this.auditService = auditService;
 		this.mapper = mapper;
-		this.registrationMapper = registrationMapper;
 	}
 
 	@Transactional
@@ -65,8 +61,9 @@ public class UserService implements IUserService {
 		user.setRoles(Set.of(role));
 		user.setStatus(USERSTATUS.WAITING_ACTIVATION);
 		user.setPassword(encoder.encode(dto.getPassword()));
-		auditService.create(new Audit(WAITING_ACTIVATION, ESSENCETYPE.USER, user.getUsername()), user.getUuid());
-		return mapper.toDTO(userDao.create(user));
+		User newUser = userDao.create(user);
+		auditService.create(new Audit(WAITING_ACTIVATION, ESSENCETYPE.USER, newUser.getUsername()), newUser.getUuid());
+		return mapper.toDTO(newUser);
 	}
 
 	@Transactional
@@ -121,6 +118,7 @@ public class UserService implements IUserService {
 		readed.setEmail(dto.getEmail());
 		readed.setUsername(dto.getUsername());
 		readed.setPassword(dto.getPassword());
+		readed.setStatus(dto.getStatus());
 		auditService.create(new Audit(UPDATED, ESSENCETYPE.USER, readed.getUsername()), readed.getUuid());
 		return mapper.toDTO(userDao.create(readed));
 	}
@@ -132,9 +130,9 @@ public class UserService implements IUserService {
 		if (readed == null) {
 			throw new IllegalArgumentException("Not found");
 		}
-		// if (!readed.getDtUpdate().isEqual(dtUpdate)) {
-//			throw new IllegalArgumentException("Version is outdated");
-//		}
+		 if (!readed.getDtUpdate().isEqual(dtUpdate)) {
+			throw new IllegalArgumentException("Version is outdated");
+		}
 		readed.setStatus(USERSTATUS.DEACTIVATED);
 		userDao.update(uuid, dtUpdate, readed);
 

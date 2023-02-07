@@ -1,0 +1,22 @@
+-- Table: app.user_roles
+
+-- DROP TABLE IF EXISTS app.user_roles;
+
+CREATE TABLE IF NOT EXISTS app.user_roles
+(
+    role_uuid uuid NOT NULL,
+    role_id uuid NOT NULL,
+    CONSTRAINT user_roles_pkey PRIMARY KEY (role_uuid, role_id),
+    CONSTRAINT fkh8ciramu9cc9q3qcqiv4ue8a6 FOREIGN KEY (role_id)
+        REFERENCES app.roles (uuid) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION,
+    CONSTRAINT fkscnap1vcwsi3gkbc99lfs5h80 FOREIGN KEY (role_uuid)
+        REFERENCES app.users (uuid) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION
+)
+
+TABLESPACE pg_default;
+
+ALTER TABLE IF EXISTS app.user_roles

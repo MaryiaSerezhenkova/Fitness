@@ -1,5 +1,6 @@
 package by.academy.fitness.domain.dto;
 
+import java.util.Objects;
 import java.util.UUID;
 
 public class IngredientDTO {
@@ -44,6 +45,17 @@ public class IngredientDTO {
 		this.weight = weight;
 	}
 
-	
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("IngredientDTO [uuid=");
+		builder.append(uuid);
+		builder.append(", product=");
+		builder.append(product);
+		builder.append(", weight=");
+		builder.append(weight);
+		builder.append("]");
+		return builder.toString();
+	}
 
 }

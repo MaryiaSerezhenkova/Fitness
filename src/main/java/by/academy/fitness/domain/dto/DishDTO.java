@@ -2,6 +2,7 @@ package by.academy.fitness.domain.dto;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -19,10 +20,11 @@ public class DishDTO {
 	@JsonSerialize(using = CustomLocalDateTimeSerializer.class)
 	@JsonDeserialize(using = CustomLocalDateTimeDesSerializer.class)
 	private LocalDateTime dtCreate;
-    @JsonProperty(access = Access.READ_ONLY)
+	@JsonProperty(access = Access.READ_ONLY)
 	@JsonSerialize(using = CustomLocalDateTimeSerializer.class)
 	@JsonDeserialize(using = CustomLocalDateTimeDesSerializer.class)
 	private LocalDateTime dtUpdate;
+
 	public UUID getUuid() {
 		return uuid;
 	}
@@ -87,7 +89,5 @@ public class DishDTO {
 		builder.append("]");
 		return builder.toString();
 	}
-
-	
 
 }

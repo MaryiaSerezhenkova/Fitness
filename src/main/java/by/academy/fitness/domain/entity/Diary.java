@@ -1,11 +1,11 @@
 package by.academy.fitness.domain.entity;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 import java.util.UUID;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
@@ -188,6 +188,29 @@ public class Diary implements IEntity {
 		builder.append(profile);
 		builder.append("]");
 		return builder.toString();
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(dish, dishId, dtCreate, dtUpdate, mealTime, product, productId, profile, profileId, uuid,
+				weight);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Diary other = (Diary) obj;
+		return Objects.equals(dish, other.dish) && Objects.equals(dishId, other.dishId)
+				&& Objects.equals(dtCreate, other.dtCreate) && Objects.equals(dtUpdate, other.dtUpdate)
+				&& Objects.equals(mealTime, other.mealTime) && Objects.equals(product, other.product)
+				&& Objects.equals(productId, other.productId) && Objects.equals(profile, other.profile)
+				&& Objects.equals(profileId, other.profileId) && Objects.equals(uuid, other.uuid)
+				&& weight == other.weight;
 	}
 
 	

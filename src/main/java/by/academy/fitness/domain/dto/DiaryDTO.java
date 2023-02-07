@@ -1,6 +1,7 @@
 package by.academy.fitness.domain.dto;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -18,7 +19,7 @@ public class DiaryDTO {
 	@JsonSerialize(using = CustomLocalDateTimeSerializer.class)
 	@JsonDeserialize(using = CustomLocalDateTimeDesSerializer.class)
 	private LocalDateTime dtCreate;
-    @JsonProperty(access = Access.READ_ONLY)
+	@JsonProperty(access = Access.READ_ONLY)
 	@JsonSerialize(using = CustomLocalDateTimeSerializer.class)
 	@JsonDeserialize(using = CustomLocalDateTimeDesSerializer.class)
 	private LocalDateTime dtUpdate;
@@ -108,6 +109,47 @@ public class DiaryDTO {
 		this.mealTime = mealTime;
 	}
 
-	
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("DiaryDTO [uuid=");
+		builder.append(uuid);
+		builder.append(", dtCreate=");
+		builder.append(dtCreate);
+		builder.append(", dtUpdate=");
+		builder.append(dtUpdate);
+		builder.append(", product=");
+		builder.append(product);
+		builder.append(", dish=");
+		builder.append(dish);
+		builder.append(", profile=");
+		builder.append(profile);
+		builder.append(", weight=");
+		builder.append(weight);
+		builder.append(", mealTime=");
+		builder.append(mealTime);
+		builder.append("]");
+		return builder.toString();
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(dish, dtCreate, dtUpdate, mealTime, product, profile, uuid, weight);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		DiaryDTO other = (DiaryDTO) obj;
+		return Objects.equals(dish, other.dish) && Objects.equals(dtCreate, other.dtCreate)
+				&& Objects.equals(dtUpdate, other.dtUpdate) && Objects.equals(mealTime, other.mealTime)
+				&& Objects.equals(product, other.product) && Objects.equals(profile, other.profile)
+				&& Objects.equals(uuid, other.uuid) && weight == other.weight;
+	}
 
 }

@@ -20,10 +20,8 @@ import by.academy.fitness.domain.entity.Audit;
 import by.academy.fitness.domain.entity.Audit.ESSENCETYPE;
 import by.academy.fitness.domain.entity.Page;
 import by.academy.fitness.domain.entity.Product;
-import by.academy.fitness.domain.entity.User;
 import by.academy.fitness.domain.mapper.impl.BaseMapper;
 import by.academy.fitness.domain.mapper.impl.ProductMapper;
-import by.academy.fitness.domain.mapper.impl.UserMapper;
 import by.academy.fitness.domain.validators.ProductValidator;
 import by.academy.fitness.service.interf.IProductService;
 
@@ -140,7 +138,7 @@ public class ProductService implements IProductService {
 			throw new IllegalArgumentException("Item not found");
 		}
 
-		if (!readed.getUser().equals(userDto)) {
+		if (!readed.getUserId().equals(userDto.getUuid())) {
 			throw new IllegalArgumentException("You can only delete the product you created");
 		}
 

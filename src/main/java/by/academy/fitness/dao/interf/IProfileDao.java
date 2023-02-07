@@ -1,11 +1,13 @@
 package by.academy.fitness.dao.interf;
 
+import java.util.UUID;
+
 import by.academy.fitness.domain.entity.Profile;
-import by.academy.fitness.domain.entity.User;
 
 public interface IProfileDao  extends IDao<Profile>{
-	Profile findByUser(User user);
 
-	Boolean existsByUser(User user);
+	Boolean existsByUserId(UUID userId);
+
+	Profile findByUserId(UUID userId);
 
 }

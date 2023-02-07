@@ -22,10 +22,7 @@ import by.academy.fitness.domain.entity.Audit.ESSENCETYPE;
 import by.academy.fitness.domain.entity.Dish;
 import by.academy.fitness.domain.entity.Ingredient;
 import by.academy.fitness.domain.entity.Page;
-import by.academy.fitness.domain.entity.Product;
-import by.academy.fitness.domain.entity.User;
 import by.academy.fitness.domain.mapper.impl.DishMapper;
-import by.academy.fitness.domain.mapper.impl.UserMapper;
 import by.academy.fitness.domain.validators.DishValidator;
 import by.academy.fitness.service.interf.IDishService;
 
@@ -56,13 +53,11 @@ public class DishService implements IDishService {
 	@Override
 	public DishDTO create(DishDTO dto) {
 		UserDTO userDto = userService.findByUsername(SecurityContextHolder.getContext().getAuthentication().getName());
-		//Dish dish = new Dish();
 		Dish dish = mapper.toEntity(dto);
 		validator.validate(dto);
 		dish.setUuid(UUID.randomUUID());
 		dish.setDtCreate(LocalDateTime.now());
 		dish.setDtUpdate(dish.getDtCreate());
-	//	dish.setName(dto.getName());
 		List<Ingredient> ingr = new ArrayList<>();
 
 		for (IngredientDTO i : dto.getIngredients()) {
@@ -94,7 +89,7 @@ public class DishService implements IDishService {
 		if (readed == null) {
 			throw new IllegalArgumentException("Item not found");
 		}
-		if (!readed.getUser().equals(userDto)) {
+		if (!readed.getUserId().equals(userDto.getUuid())) {
 			throw new IllegalArgumentException("You can only update the product you created");
 		}
 
@@ -123,7 +118,7 @@ public class DishService implements IDishService {
 	@Override
 	public void delete(UUID uuid, LocalDateTime dtUpdate) {
 		UserDTO userDto = userService.findByUsername(SecurityContextHolder.getContext().getAuthentication().getName());
-		if (!dishDao.findByUuid(uuid).getUser().equals(userDto)) {
+		if (!dishDao.findByUuid(uuid).getUser().getUuid().equals(userDto.getUuid())) {
 			throw new IllegalArgumentException("You can only delete the product you created");
 		}
 		auditService.create(new Audit(DELETED, ESSENCETYPE.DISH, uuid.toString()), userDto.getUuid());

@@ -1,7 +1,5 @@
 package by.academy.fitness.dao;
 
-import javax.persistence.metamodel.SingularAttribute;
-
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)

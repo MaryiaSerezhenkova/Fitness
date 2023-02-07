@@ -1,0 +1,20 @@
+-- Table: app.verification_token
+
+-- DROP TABLE IF EXISTS app.verification_token;
+
+CREATE TABLE IF NOT EXISTS app.verification_token
+(
+    uuid uuid NOT NULL,
+    dt_create timestamp(3) without time zone,
+    token character varying(255) COLLATE pg_catalog."default" NOT NULL,
+    user_uuid uuid NOT NULL,
+    CONSTRAINT verification_token_pkey PRIMARY KEY (uuid),
+    CONSTRAINT fks7gctkwihx5sc4aec5fxe6442 FOREIGN KEY (user_uuid)
+        REFERENCES app.users (uuid) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION
+)
+
+TABLESPACE pg_default;
+
+ALTER TABLE IF EXISTS app.verification_token

@@ -29,8 +29,7 @@ public class SaveUserValidaror implements IValidator<UserDTO> {
 		if (dto.getPassword() == null || dto.getPassword().isBlank()) {
 			errors.add("Password is empty");
 		}
-		if (dto.getStatus() == null || dto.getStatus().equals(USERSTATUS.ACTIVATED)
-				|| dto.getStatus().equals(USERSTATUS.DEACTIVATED)) {
+		if (dto.getStatus() == null ) {
 			errors.add("Status is empty");
 		}
 		if (dto.getStatus().equals(USERSTATUS.ACTIVATED) || dto.getStatus().equals(USERSTATUS.DEACTIVATED)) {

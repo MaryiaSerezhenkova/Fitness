@@ -7,7 +7,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import by.academy.fitness.dao.RoleDao;
-import by.academy.fitness.dao.interf.IRoleDao;
 import by.academy.fitness.domain.entity.Role;
 import by.academy.fitness.domain.entity.User.ROLE;
 

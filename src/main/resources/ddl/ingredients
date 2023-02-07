@@ -1,0 +1,24 @@
+-- Table: app.ingredient
+
+-- DROP TABLE IF EXISTS app.ingredient;
+
+CREATE TABLE IF NOT EXISTS app.ingredient
+(
+    uuid uuid NOT NULL,
+    weight integer,
+    product_uuid uuid,
+    dish_uuid uuid,
+    CONSTRAINT ingredient_pkey PRIMARY KEY (uuid),
+    CONSTRAINT fk7fku9gq5n07a8ci7g6hqkg5v6 FOREIGN KEY (dish_uuid)
+        REFERENCES app.dish (uuid) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION,
+    CONSTRAINT fkajynfmymf1bespqeq0bo779an FOREIGN KEY (product_uuid)
+        REFERENCES app.product (uuid) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION
+)
+
+TABLESPACE pg_default;
+
+ALTER TABLE IF EXISTS app.ingredient

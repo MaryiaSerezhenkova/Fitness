@@ -1,0 +1,21 @@
+-- Table: app.dish
+
+-- DROP TABLE IF EXISTS app.dish;
+
+CREATE TABLE IF NOT EXISTS app.dish
+(
+    uuid uuid NOT NULL,
+    dt_create timestamp(3) without time zone,
+    dt_update timestamp(3) without time zone,
+    name character varying(255) COLLATE pg_catalog."default",
+    user_uuid uuid,
+    CONSTRAINT dish_pkey PRIMARY KEY (uuid),
+    CONSTRAINT fkhrh6r2mlrbqcbsna5pckmt564 FOREIGN KEY (user_uuid)
+        REFERENCES app.users (uuid) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION
+)
+
+TABLESPACE pg_default;
+
+ALTER TABLE IF EXISTS app.dish

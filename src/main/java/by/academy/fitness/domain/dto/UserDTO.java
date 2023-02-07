@@ -2,6 +2,7 @@ package by.academy.fitness.domain.dto;
 
 import java.time.LocalDateTime;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 
@@ -19,11 +20,6 @@ public class UserDTO {
 
 	@JsonProperty(access = Access.READ_ONLY)
 	private UUID uuid;
-	private String email;
-	private String username;
-	private Set<Role> roles = new HashSet<>();
-	private USERSTATUS status;
-	private String password;
 	@JsonProperty(access = Access.READ_ONLY)
 	@JsonSerialize(using = CustomLocalDateTimeSerializer.class)
 	@JsonDeserialize(using = CustomLocalDateTimeDesSerializer.class)
@@ -32,6 +28,13 @@ public class UserDTO {
 	@JsonSerialize(using = CustomLocalDateTimeSerializer.class)
 	@JsonDeserialize(using = CustomLocalDateTimeDesSerializer.class)
 	private LocalDateTime dtUpdate;
+	private String email;
+	private String username;
+	private Set<Role> roles = new HashSet<>();
+	private USERSTATUS status;
+	@JsonProperty(access=Access.WRITE_ONLY)
+	private String password;
+	
 
 	public UserDTO() {
 		super();
@@ -109,6 +112,49 @@ public class UserDTO {
 
 	public void setPassword(String password) {
 		this.password = password;
+	}
+
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("UserDTO [uuid=");
+		builder.append(uuid);
+		builder.append(", dtCreate=");
+		builder.append(dtCreate);
+		builder.append(", dtUpdate=");
+		builder.append(dtUpdate);
+		builder.append(", email=");
+		builder.append(email);
+		builder.append(", username=");
+		builder.append(username);
+		builder.append(", roles=");
+		builder.append(roles);
+		builder.append(", status=");
+		builder.append(status);
+		builder.append(", password=");
+		builder.append(password);
+		builder.append("]");
+		return builder.toString();
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(dtCreate, dtUpdate, email, password, roles, status, username, uuid);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		UserDTO other = (UserDTO) obj;
+		return Objects.equals(dtCreate, other.dtCreate) && Objects.equals(dtUpdate, other.dtUpdate)
+				&& Objects.equals(email, other.email) && Objects.equals(password, other.password)
+				&& Objects.equals(roles, other.roles) && status == other.status
+				&& Objects.equals(username, other.username) && Objects.equals(uuid, other.uuid);
 	}
 
 }

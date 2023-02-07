@@ -1,6 +1,7 @@
 package by.academy.fitness.domain.entity;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 import java.util.UUID;
 
 import javax.persistence.CascadeType;
@@ -121,6 +122,46 @@ public class Audit implements IEntity {
 
 	public void setUserId(UUID userId) {
 		this.userId = userId;
+	}
+
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("Audit [uuid=");
+		builder.append(uuid);
+		builder.append(", dtCreate=");
+		builder.append(dtCreate);
+		builder.append(", user=");
+		builder.append(user);
+		builder.append(", userId=");
+		builder.append(userId);
+		builder.append(", text=");
+		builder.append(text);
+		builder.append(", type=");
+		builder.append(type);
+		builder.append(", id=");
+		builder.append(id);
+		builder.append("]");
+		return builder.toString();
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(dtCreate, id, text, type, user, userId, uuid);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Audit other = (Audit) obj;
+		return Objects.equals(dtCreate, other.dtCreate) && Objects.equals(id, other.id)
+				&& Objects.equals(text, other.text) && type == other.type && Objects.equals(user, other.user)
+				&& Objects.equals(userId, other.userId) && Objects.equals(uuid, other.uuid);
 	}
 
 }

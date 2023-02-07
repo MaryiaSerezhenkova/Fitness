@@ -1,0 +1,33 @@
+-- Table: app.diary
+
+-- DROP TABLE IF EXISTS app.diary;
+
+CREATE TABLE IF NOT EXISTS app.diary
+(
+    uuid uuid NOT NULL,
+    dt_create timestamp(3) without time zone,
+    dt_update timestamp(3) without time zone,
+    meal_time timestamp(3) without time zone,
+    weight integer,
+    dish_uuid uuid,
+    product_uuid uuid,
+    profile_uuid uuid,
+    profile bytea,
+    CONSTRAINT diary_pkey PRIMARY KEY (uuid),
+    CONSTRAINT fkbe9d18f177lkfq5tj3jtmrdto FOREIGN KEY (profile_uuid)
+        REFERENCES app.profile (uuid) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION,
+    CONSTRAINT fkm7h6vq2avirr0trgplx5qierh FOREIGN KEY (product_uuid)
+        REFERENCES app.product (uuid) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION,
+    CONSTRAINT fkq456c6ytscekl88kxgtwji9at FOREIGN KEY (dish_uuid)
+        REFERENCES app.dish (uuid) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION
+)
+
+TABLESPACE pg_default;
+
+ALTER TABLE IF EXISTS app.diary

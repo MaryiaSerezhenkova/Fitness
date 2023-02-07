@@ -43,7 +43,7 @@ public class UserController {
 	@GetMapping("/me")
 	public ResponseEntity<UserDTO> me() {
 		return new ResponseEntity<>(
-				userService.findByEmail(SecurityContextHolder.getContext().getAuthentication().getName()),
+				userService.findByUsername(SecurityContextHolder.getContext().getAuthentication().getName()),
 				HttpStatus.OK);
 	}
 

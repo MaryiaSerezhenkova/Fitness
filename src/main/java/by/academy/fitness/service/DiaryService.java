@@ -19,11 +19,7 @@ import by.academy.fitness.domain.dto.UserDTO;
 import by.academy.fitness.domain.entity.Audit;
 import by.academy.fitness.domain.entity.Audit.ESSENCETYPE;
 import by.academy.fitness.domain.entity.Diary;
-import by.academy.fitness.domain.entity.Dish;
 import by.academy.fitness.domain.entity.Page;
-import by.academy.fitness.domain.entity.Product;
-import by.academy.fitness.domain.entity.Profile;
-import by.academy.fitness.domain.entity.User;
 import by.academy.fitness.domain.mapper.impl.DiaryMapper;
 import by.academy.fitness.domain.validators.DiaryValidator;
 import by.academy.fitness.service.interf.IDiaryService;
@@ -59,10 +55,8 @@ public class DiaryService implements IDiaryService {
 		UserDTO userDto = userService.findByUsername(SecurityContextHolder.getContext().getAuthentication().getName());
 		validator.validate(dto);
 		Diary diary = mapper.toEntity(dto);
-
 		ProfileDTO profile = profileService.findByUserId(userDto.getUuid());
 		diary.setUuid(UUID.randomUUID());
-
 		diary.setDtCreate(LocalDateTime.now());
 		diary.setDtUpdate(diary.getDtCreate());
 		if (dto.getDish() != null) {
@@ -71,9 +65,9 @@ public class DiaryService implements IDiaryService {
 		if (dto.getProduct() != null) {
 			diary.setProductId(dto.getProduct().getUuid());
 		}
-		diary.setWeight(dto.getWeight());
-		diary.setMealTime(dto.getMealTime());
-		diary.setProfile(new Profile(profile.getId()));
+//		diary.setWeight(dto.getWeight());
+//		diary.setMealTime(dto.getMealTime());
+		diary.setProfileId(profile.getUuid());
 		auditService.create(new Audit(CREATED, ESSENCETYPE.DIARY, diary.getUuid().toString()), userDto.getUuid());
 		return mapper.toDTO(diaryDao.create(diary));
 	}
@@ -120,7 +114,7 @@ public class DiaryService implements IDiaryService {
 		if (readed == null) {
 			throw new IllegalArgumentException("Item not found");
 		}
-		if (!readed.getProfile().getUser().equals(userDto)) {
+		if (!readed.getProfile().getUserId().equals(userDto.getUuid())) {
 			throw new IllegalArgumentException("You can only update the product you created");
 		}
 
@@ -130,12 +124,12 @@ public class DiaryService implements IDiaryService {
 		validator.validate(dto);
 		readed.setDtUpdate(LocalDateTime.now());
 		readed.setWeight(dto.getWeight());
-//		if (dto.getProductUuid() != null) {
-//			readed.setProduct(new Product(dto.getProductUuid()));
-//		}
-//		if (dto.getDishUuid() != null) {
-//			readed.setDish(new Dish(dto.getDishUuid()));
-//		}
+		if (dto.getDish() != null) {
+			readed.setDishId(dto.getDish().getUuid());
+		}
+		if (dto.getProduct() != null) {
+			readed.setProductId(dto.getProduct().getUuid());
+		}
 		readed.setMealTime(dto.getMealTime());
 		auditService.create(new Audit(UPDATED, ESSENCETYPE.DIARY, readed.getUuid().toString()), userDto.getUuid());
 

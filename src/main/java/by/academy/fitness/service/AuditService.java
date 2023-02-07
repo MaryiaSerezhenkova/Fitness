@@ -14,7 +14,6 @@ import by.academy.fitness.dao.Sorting;
 import by.academy.fitness.domain.dto.AuditDTO;
 import by.academy.fitness.domain.entity.Audit;
 import by.academy.fitness.domain.entity.Page;
-import by.academy.fitness.domain.entity.User;
 import by.academy.fitness.domain.mapper.impl.AuditMapper;
 import by.academy.fitness.service.interf.IAuditService;
 

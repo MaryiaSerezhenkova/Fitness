@@ -1,6 +1,7 @@
 package by.academy.fitness.domain.dto;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -16,7 +17,7 @@ import by.academy.fitness.domain.entity.Profile.GENDER;
 public class ProfileDTO {
 
 	@JsonProperty(access = Access.READ_ONLY)
-	private UUID id;
+	private UUID uuid;
 	@JsonProperty(access = Access.READ_ONLY)
 	@JsonSerialize(using = CustomLocalDateTimeSerializer.class)
 	@JsonDeserialize(using = CustomLocalDateTimeDesSerializer.class)
@@ -49,12 +50,12 @@ public class ProfileDTO {
 		this.gender = gender;
 	}
 
-	public UUID getId() {
-		return id;
+	public UUID getUuid() {
+		return uuid;
 	}
 
-	public void setId(UUID id) {
-		this.id = id;
+	public void setUuid(UUID uuid) {
+		this.uuid = uuid;
 	}
 
 	public UserShortViewDTO getUser() {
@@ -127,6 +128,54 @@ public class ProfileDTO {
 
 	public void setGender(GENDER gender) {
 		this.gender = gender;
+	}
+
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("ProfileDTO [uuid=");
+		builder.append(uuid);
+		builder.append(", dtCreate=");
+		builder.append(dtCreate);
+		builder.append(", dtUpdate=");
+		builder.append(dtUpdate);
+		builder.append(", height=");
+		builder.append(height);
+		builder.append(", weight=");
+		builder.append(weight);
+		builder.append(", dtBirthday=");
+		builder.append(dtBirthday);
+		builder.append(", target=");
+		builder.append(target);
+		builder.append(", type=");
+		builder.append(type);
+		builder.append(", gender=");
+		builder.append(gender);
+		builder.append(", user=");
+		builder.append(user);
+		builder.append("]");
+		return builder.toString();
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(dtBirthday, dtCreate, dtUpdate, gender, height, target, type, user, uuid, weight);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		ProfileDTO other = (ProfileDTO) obj;
+		return Objects.equals(dtBirthday, other.dtBirthday) && Objects.equals(dtCreate, other.dtCreate)
+				&& Objects.equals(dtUpdate, other.dtUpdate) && gender == other.gender && height == other.height
+				&& Double.doubleToLongBits(target) == Double.doubleToLongBits(other.target) && type == other.type
+				&& Objects.equals(user, other.user) && Objects.equals(uuid, other.uuid)
+				&& Double.doubleToLongBits(weight) == Double.doubleToLongBits(other.weight);
 	}
 
 }

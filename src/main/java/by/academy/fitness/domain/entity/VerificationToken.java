@@ -1,6 +1,7 @@
 package by.academy.fitness.domain.entity;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 import java.util.UUID;
 
 import javax.persistence.CascadeType;
@@ -21,7 +22,7 @@ import by.academy.fitness.config.CustomLocalDateTimeSerializer;
 
 @Entity
 @Table(name = "verification_token", schema = "app")
-public class VerificationToken implements IEntity  {
+public class VerificationToken implements IEntity {
 
 	/**
 	 * 
@@ -41,8 +42,10 @@ public class VerificationToken implements IEntity  {
 	private String token;
 
 	@OneToOne(targetEntity = User.class, fetch = FetchType.EAGER, cascade = { CascadeType.PERSIST })
-	@JoinColumn(name = "user_uuid", nullable = false, referencedColumnName = "uuid")
+	@JoinColumn(name = "user_uuid", referencedColumnName = "uuid", insertable = false, updatable = false)
 	private User user;
+	@Column(name = "user_uuid")
+	private UUID userId;
 
 	public VerificationToken() {
 		super();
@@ -52,7 +55,7 @@ public class VerificationToken implements IEntity  {
 		this.token = token;
 		this.user = user;
 	}
-	
+
 	public VerificationToken(UUID uuid, LocalDateTime dtCreate,
 			@NotEmpty(message = "Token cannot be empty") String token, User user) {
 		super();
@@ -61,6 +64,7 @@ public class VerificationToken implements IEntity  {
 		this.token = token;
 		this.user = user;
 	}
+
 	public UUID getUuid() {
 		return uuid;
 	}
@@ -92,6 +96,49 @@ public class VerificationToken implements IEntity  {
 	public void setUser(User user) {
 		this.user = user;
 	}
-	
+
+	public UUID getUserId() {
+		return userId;
+	}
+
+	public void setUserId(UUID userId) {
+		this.userId = userId;
+	}
+
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("VerificationToken [uuid=");
+		builder.append(uuid);
+		builder.append(", dtCreate=");
+		builder.append(dtCreate);
+		builder.append(", token=");
+		builder.append(token);
+		builder.append(", user=");
+		builder.append(user);
+		builder.append(", userId=");
+		builder.append(userId);
+		builder.append("]");
+		return builder.toString();
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(dtCreate, token, user, userId, uuid);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		VerificationToken other = (VerificationToken) obj;
+		return Objects.equals(dtCreate, other.dtCreate) && Objects.equals(token, other.token)
+				&& Objects.equals(user, other.user) && Objects.equals(userId, other.userId)
+				&& Objects.equals(uuid, other.uuid);
+	}
 
 }

@@ -12,7 +12,6 @@ import by.academy.fitness.dao.VerificationDao;
 import by.academy.fitness.domain.dto.UserDTO;
 import by.academy.fitness.domain.entity.Audit;
 import by.academy.fitness.domain.entity.Audit.ESSENCETYPE;
-import by.academy.fitness.domain.entity.User;
 import by.academy.fitness.domain.entity.User.USERSTATUS;
 import by.academy.fitness.domain.entity.VerificationToken;
 import by.academy.fitness.domain.validators.SaveUserValidaror;
@@ -83,7 +82,7 @@ public class VerificationService implements IVerificationService {
 		if (token == null) {
 			throw new ValidationException("User not found");
 		}
-		if (t.getUser().equals(userDto)) {
+		if (t.getUser().getUuid().equals(userDto.getUuid())) {
 			userDto.setStatus(USERSTATUS.ACTIVATED);
 			userService.update(userDto.getUuid(), userDto.getDtUpdate(), userDto);
 			return true;
@@ -104,18 +103,30 @@ public class VerificationService implements IVerificationService {
 	public UserDTO waitingActivation(UserDTO dto) {
 		validator.validate(dto);
 		UserDTO userDto = userService.findByEmail(dto.getEmail());
+		
+		if (!userDto.getEmail().equals(dto.getEmail())) {
+			throw new ValidationException("User not found");
+		}
+		if (!userDto.getUsername().equals(dto.getUsername())) {
+			throw new ValidationException("User not found");
+		}
 		VerificationToken token = new VerificationToken();
 		token.setDtCreate(LocalDateTime.now());
 		token.setUuid(UUID.randomUUID());
 		String encodedToken = CryptoUtil.encrypt("VerificationToken",
 				token.getUuid().toString() + "|" + dto.getEmail());
-		token.setUser(new User(userDto.getUuid()));
+		token.setUserId(userDto.getUuid());
 		token.setToken(UriUtils.encode(encodedToken, "UTF-8"));
 		verificationDao.create(token);
 		sendMessage(dto.getEmail(), token.getToken());
 		auditService.create(new Audit(ACTIVATED, ESSENCETYPE.USER, userDto.getUsername()), userDto.getUuid());
 
 		return userService.findByEmail(dto.getEmail());
+	}
+	@Transactional
+	@Override
+	public VerificationToken findByUser(UserDTO dto) {
+		return verificationDao.findByUser(dto.getUuid());
 	}
 
 }

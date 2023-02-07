@@ -19,7 +19,6 @@ import by.academy.fitness.domain.entity.Audit;
 import by.academy.fitness.domain.entity.Audit.ESSENCETYPE;
 import by.academy.fitness.domain.entity.Page;
 import by.academy.fitness.domain.entity.Profile;
-import by.academy.fitness.domain.entity.User;
 import by.academy.fitness.domain.mapper.impl.ProfileMapper;
 import by.academy.fitness.service.interf.IProfileService;
 
@@ -81,7 +80,7 @@ public class ProfileService implements IProfileService {
 		if (readed == null) {
 			throw new IllegalArgumentException("Item not found");
 		}
-		if (!readed.getUser().equals(userDto)) {
+		if (!readed.getUser().getUuid().equals(userDto.getUuid())) {
 			throw new IllegalArgumentException("You can only update the profile you created");
 		}
 
@@ -95,7 +94,7 @@ public class ProfileService implements IProfileService {
 		readed.setTarget(dto.getTarget());
 		readed.setType(dto.getType());
 		readed.setGender(dto.getGender());
-		readed.setUser(new User(userDto.getUuid()));
+		readed.setUserId(userDto.getUuid());
 		auditService.create(new Audit(UPDATED, ESSENCETYPE.PROFILE, readed.getUuid().toString()),
 				userDto.getUuid());
 		return mapper.toDTO(profileDao.create(readed));
@@ -110,21 +109,16 @@ public class ProfileService implements IProfileService {
 		if (profile == null) {
 			throw new IllegalArgumentException("Item not found");
 		}
-		if (!profile.getUser().equals(userDto)) {
+		if (!profile.getUser().getUuid().equals(userDto.getUuid())) {
 			throw new IllegalArgumentException("You can only update the profile you created");
 		}
 
 		if (!profile.getDtUpdate().isEqual(dtUpdate)) {
 			throw new IllegalArgumentException("Sorry, this item has already been edited");
 		}
-		auditService.create(new Audit(DELETED, ESSENCETYPE.PROFILE, profile.getId().toString()),
+		auditService.create(new Audit(DELETED, ESSENCETYPE.PROFILE, profile.getUuid().toString()),
 				userDto.getUuid());
 		profileDao.delete(uuid, dtUpdate);
-	}
-
-	@Override
-	public Profile findByUser(User user) {
-		return profileDao.findByUser(user);
 	}
 
 	@Override

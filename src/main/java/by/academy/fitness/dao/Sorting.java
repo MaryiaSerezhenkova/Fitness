@@ -2,8 +2,6 @@ package by.academy.fitness.dao;
 
 import java.util.List;
 
-import javax.persistence.metamodel.SingularAttribute;
-
 public class Sorting {
 
     private String id;
@@ -30,17 +28,11 @@ public class Sorting {
         return new Sorting(id, false);
     }
 
-//    public static Sorting of(SingularAttribute<?, ?> id) {
-//        return new Sorting(id.getName(), false);
-//    }
 
     public static Sorting of(String id, boolean desc) {
         return new Sorting(id, desc);
     }
 
-//    public static Sorting of(SingularAttribute<?, ?> id, boolean desc) {
-//        return new Sorting(id.getName(), desc);
-//    }
 
     public static Sorting sortingFrom(String id, boolean desc) {
         return new Sorting(id, desc);

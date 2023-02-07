@@ -1,6 +1,7 @@
 package by.academy.fitness.domain.entity;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 import java.util.UUID;
 
 import javax.persistence.CascadeType;
@@ -11,7 +12,6 @@ import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Version;
@@ -66,21 +66,11 @@ public class Profile implements IEntity {
 	private GENDER gender;
 
 	@OneToOne(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
-	@JoinColumn(name = "user_uuid", referencedColumnName = "uuid", insertable=false, updatable=false)
+	@JoinColumn(name = "user_uuid", referencedColumnName = "uuid", insertable = false, updatable = false)
 	private User user;
 	@Column(name = "user_uuid")
 	private UUID userId;
 
-	
-	public UUID getUserId() {
-		return userId;
-	}
-
-	public void setUserId(UUID userId) {
-		this.userId = userId;
-	}
-
-	
 	public Profile() {
 		super();
 	}
@@ -193,6 +183,65 @@ public class Profile implements IEntity {
 	@Override
 	public UUID getUuid() {
 		return uuid;
+	}
+
+	public UUID getUserId() {
+		return userId;
+	}
+
+	public void setUserId(UUID userId) {
+		this.userId = userId;
+	}
+
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("Profile [uuid=");
+		builder.append(uuid);
+		builder.append(", dtCreate=");
+		builder.append(dtCreate);
+		builder.append(", dtUpdate=");
+		builder.append(dtUpdate);
+		builder.append(", height=");
+		builder.append(height);
+		builder.append(", weight=");
+		builder.append(weight);
+		builder.append(", dtBirthday=");
+		builder.append(dtBirthday);
+		builder.append(", target=");
+		builder.append(target);
+		builder.append(", type=");
+		builder.append(type);
+		builder.append(", gender=");
+		builder.append(gender);
+		builder.append(", user=");
+		builder.append(user);
+		builder.append(", userId=");
+		builder.append(userId);
+		builder.append("]");
+		return builder.toString();
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(dtBirthday, dtCreate, dtUpdate, gender, height, target, type, user, userId, uuid, weight);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Profile other = (Profile) obj;
+		return Objects.equals(dtBirthday, other.dtBirthday) && Objects.equals(dtCreate, other.dtCreate)
+				&& Objects.equals(dtUpdate, other.dtUpdate) && gender == other.gender && height == other.height
+				&& Double.doubleToLongBits(target) == Double.doubleToLongBits(other.target) && type == other.type
+				&& Objects.equals(user, other.user) && Objects.equals(userId, other.userId)
+				&& Objects.equals(uuid, other.uuid)
+				&& Double.doubleToLongBits(weight) == Double.doubleToLongBits(other.weight);
 	}
 
 }

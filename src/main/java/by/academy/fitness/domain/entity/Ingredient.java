@@ -1,5 +1,6 @@
 package by.academy.fitness.domain.entity;
 
+import java.util.Objects;
 import java.util.UUID;
 
 import javax.persistence.Column;
@@ -83,6 +84,5 @@ public class Ingredient implements IEntity {
 		builder.append("]");
 		return builder.toString();
 	}
-
 	
 }
