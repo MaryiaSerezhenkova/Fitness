@@ -159,4 +159,24 @@ public class Dish implements IEntity {
 		return builder.toString();
 	}
 
+	@Override
+	public int hashCode() {
+		return Objects.hash(dtCreate, dtUpdate, ingredients, name, user, userId, uuid);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Dish other = (Dish) obj;
+		return Objects.equals(dtCreate, other.dtCreate) && Objects.equals(dtUpdate, other.dtUpdate)
+				&& Objects.equals(ingredients, other.ingredients) && Objects.equals(name, other.name)
+				&& Objects.equals(user, other.user) && Objects.equals(userId, other.userId)
+				&& Objects.equals(uuid, other.uuid);
+	}
+
 }

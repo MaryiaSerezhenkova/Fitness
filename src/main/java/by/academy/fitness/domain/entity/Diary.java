@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.UUID;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -38,10 +39,10 @@ public class Diary implements IEntity {
 	@JsonSerialize(using = CustomLocalDateTimeSerializer.class)
 	@JsonDeserialize(using = CustomLocalDateTimeDesSerializer.class)
 	private LocalDateTime dtUpdate;
-	@ManyToOne(optional = true)
+	@ManyToOne(cascade = CascadeType.MERGE, optional = true)
 	@JoinColumn(name = "product_uuid", nullable = true, referencedColumnName = "uuid",insertable=false, updatable=false)
 	private Product product;
-	@ManyToOne(optional = true)
+	@ManyToOne(cascade = CascadeType.MERGE, optional = true)
 	@JoinColumn(name = "dish_uuid", nullable = true, referencedColumnName = "uuid",insertable=false, updatable=false)
 	private Dish dish;
 	@Column

@@ -84,5 +84,23 @@ public class Ingredient implements IEntity {
 		builder.append("]");
 		return builder.toString();
 	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(product, productId, uuid, weight);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Ingredient other = (Ingredient) obj;
+		return Objects.equals(product, other.product) && Objects.equals(productId, other.productId)
+				&& Objects.equals(uuid, other.uuid) && weight == other.weight;
+	}
 	
 }

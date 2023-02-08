@@ -69,7 +69,8 @@ public class VerificationService implements IVerificationService {
 	@Override
 	public boolean verify(String token) {
 		String info = null;
-		info = CryptoUtil.decrypt("VerificationToken", UriUtils.decode(token, "UTF-8"));
+		//info = CryptoUtil.decrypt("VerificationToken", UriUtils.decode(token, "UTF-8"));
+		info = CryptoUtil.decrypt("VerificationToken", token);
 		String[] parts = info.split("\\|");
 		if (parts.length != 2) {
 			throw new ValidationException("Invalid token");
@@ -116,7 +117,8 @@ public class VerificationService implements IVerificationService {
 		String encodedToken = CryptoUtil.encrypt("VerificationToken",
 				token.getUuid().toString() + "|" + dto.getEmail());
 		token.setUserId(userDto.getUuid());
-		token.setToken(UriUtils.encode(encodedToken, "UTF-8"));
+	//	token.setToken(UriUtils.encode(encodedToken, "UTF-8"));
+		token.setToken(encodedToken);
 		verificationDao.create(token);
 		sendMessage(dto.getEmail(), token.getToken());
 		auditService.create(new Audit(ACTIVATED, ESSENCETYPE.USER, userDto.getUsername()), userDto.getUuid());

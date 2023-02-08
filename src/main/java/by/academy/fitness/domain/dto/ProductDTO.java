@@ -14,7 +14,7 @@ import by.academy.fitness.config.CustomLocalDateTimeSerializer;
 import by.academy.fitness.domain.entity.Product.UNIT;
 
 public class ProductDTO {
-	@JsonProperty(access = Access.READ_ONLY)
+	//@JsonProperty(access = Access.READ_ONLY)
 	private UUID uuid;
 	@JsonProperty(access = Access.READ_ONLY)
 	@JsonSerialize(using = CustomLocalDateTimeSerializer.class)

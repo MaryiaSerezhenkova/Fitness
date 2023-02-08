@@ -68,7 +68,8 @@ public class DishService implements IDishService {
 			ingr.add(x);
 		}
 		dish.setIngredients(ingr);
-		dish.setUserId(userDto.getUuid());;
+		dish.setUserId(userDto.getUuid());
+		;
 		auditService.create(new Audit(CREATED, ESSENCETYPE.DISH, dish.getName() + " " + dish.getUuid().toString()),
 				userDto.getUuid());
 
@@ -102,12 +103,22 @@ public class DishService implements IDishService {
 		List<Ingredient> ingr = new ArrayList<>();
 		for (IngredientDTO i : dto.getIngredients()) {
 			Ingredient x = new Ingredient();
-			x.setUuid(UUID.randomUUID());
+			if (i.getUuid() != null) {
+				x.setUuid(i.getUuid());
+			} else {
+				x.setUuid(UUID.randomUUID());
+			}
 			x.setProductId(i.getProduct().getUuid());
 			x.setWeight(i.getWeight());
 			ingr.add(x);
 		}
-		readed.setIngredients(ingr);
+		// readed.setIngredients(ingr);
+		if (readed.getIngredients() != null) {
+			readed.getIngredients().clear();
+			readed.getIngredients().addAll(ingr);
+		} else {
+			readed.setIngredients(ingr);
+		}
 		auditService.create(new Audit(UPDATED, ESSENCETYPE.DISH, readed.getName() + " " + readed.getUuid().toString()),
 				userDto.getUuid());
 

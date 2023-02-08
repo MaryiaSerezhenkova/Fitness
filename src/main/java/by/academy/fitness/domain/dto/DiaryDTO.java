@@ -13,7 +13,7 @@ import by.academy.fitness.config.CustomLocalDateTimeDesSerializer;
 import by.academy.fitness.config.CustomLocalDateTimeSerializer;
 
 public class DiaryDTO {
-	@JsonProperty(access = Access.READ_ONLY)
+	//@JsonProperty(access = Access.READ_ONLY)
 	private UUID uuid;
 	@JsonProperty(access = Access.READ_ONLY)
 	@JsonSerialize(using = CustomLocalDateTimeSerializer.class)

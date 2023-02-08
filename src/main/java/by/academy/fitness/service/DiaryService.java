@@ -59,12 +59,6 @@ public class DiaryService implements IDiaryService {
 		diary.setUuid(UUID.randomUUID());
 		diary.setDtCreate(LocalDateTime.now());
 		diary.setDtUpdate(diary.getDtCreate());
-		if (dto.getDish() != null) {
-			diary.setDishId(dto.getDish().getUuid());
-		}
-		if (dto.getProduct() != null) {
-			diary.setProductId(dto.getProduct().getUuid());
-		}
 //		diary.setWeight(dto.getWeight());
 //		diary.setMealTime(dto.getMealTime());
 		diary.setProfileId(profile.getUuid());

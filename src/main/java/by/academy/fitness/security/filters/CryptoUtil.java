@@ -39,7 +39,7 @@ public class CryptoUtil {
 			ecipher.init(Cipher.ENCRYPT_MODE, key, paramSpec);
 			byte[] in = plainText.getBytes("UTF-8");
 			byte[] out = ecipher.doFinal(in);
-			return new String(Base64.getEncoder().encode(out));
+			return new String(Base64.getUrlEncoder().encode(out));
 
 		} catch (InvalidKeySpecException | NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException
 				| InvalidAlgorithmParameterException | UnsupportedEncodingException | IllegalBlockSizeException
@@ -58,7 +58,7 @@ public class CryptoUtil {
 // Decryption process; same key will be used for decr
 			Cipher dcipher = Cipher.getInstance(key.getAlgorithm());
 			dcipher.init(Cipher.DECRYPT_MODE, key, paramSpec);
-			byte[] enc = Base64.getDecoder().decode(encryptedText);
+			byte[] enc = Base64.getUrlDecoder().decode(encryptedText);
 			byte[] utf8 = dcipher.doFinal(enc);
 			return new String(utf8, "UTF-8");
 

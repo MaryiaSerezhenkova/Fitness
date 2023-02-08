@@ -227,4 +227,30 @@ public class Product implements IEntity {
 		builder.append("]");
 		return builder.toString();
 	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(carbohydrates, colories, dtCreate, dtUpdate, fats, name, proteins, unit, user, userId, uuid,
+				weight);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Product other = (Product) obj;
+		return Double.doubleToLongBits(carbohydrates) == Double.doubleToLongBits(other.carbohydrates)
+				&& colories == other.colories && Objects.equals(dtCreate, other.dtCreate)
+				&& Objects.equals(dtUpdate, other.dtUpdate)
+				&& Double.doubleToLongBits(fats) == Double.doubleToLongBits(other.fats)
+				&& Objects.equals(name, other.name)
+				&& Double.doubleToLongBits(proteins) == Double.doubleToLongBits(other.proteins) && unit == other.unit
+				&& Objects.equals(user, other.user) && Objects.equals(userId, other.userId)
+				&& Objects.equals(uuid, other.uuid) && weight == other.weight;
+	}
+	
 }
